@@ -1,0 +1,186 @@
+[
+  {
+    "station_code": "NDLS",
+    "station_name": "New Delhi",
+    "state": "Delhi",
+    "zone": "NR",
+    "latitude": 28.6415,
+    "longitude": 77.2207
+  },
+  {
+    "station_code": "NZM",
+    "station_name": "Hazrat Nizamuddin",
+    "state": "Delhi",
+    "zone": "NR",
+    "latitude": 28.5889,
+    "longitude": 77.2536
+  },
+  {
+    "station_code": "MTJ",
+    "station_name": "Mathura Junction",
+    "state": "Uttar Pradesh",
+    "zone": "NCR",
+    "latitude": 27.4924,
+    "longitude": 77.6737
+  },
+  {
+    "station_code": "AGC",
+    "station_name": "Agra Cantt",
+    "state": "Uttar Pradesh",
+    "zone": "NCR",
+    "latitude": 27.1591,
+    "longitude": 77.9942
+  },
+  {
+    "station_code": "GWL",
+    "station_name": "Gwalior Junction",
+    "state": "Madhya Pradesh",
+    "zone": "NCR",
+    "latitude": 26.2163,
+    "longitude": 78.1884
+  },
+  {
+    "station_code": "VGLJ",
+    "station_name": "V Lakshmibai Jhansi",
+    "state": "Uttar Pradesh",
+    "zone": "NCR",
+    "latitude": 25.4484,
+    "longitude": 78.5685
+  },
+  {
+    "station_code": "BINA",
+    "station_name": "Bina Junction",
+    "state": "Madhya Pradesh",
+    "zone": "WCR",
+    "latitude": 24.1793,
+    "longitude": 78.1843
+  },
+  {
+    "station_code": "BPL",
+    "station_name": "Bhopal Junction",
+    "state": "Madhya Pradesh",
+    "zone": "WCR",
+    "latitude": 23.2656,
+    "longitude": 77.4116
+  },
+  {
+    "station_code": "RKMP",
+    "station_name": "Rani Kamalapati",
+    "state": "Madhya Pradesh",
+    "zone": "WCR",
+    "latitude": 23.2084,
+    "longitude": 77.4419
+  },
+  {
+    "station_code": "KOTA",
+    "station_name": "Kota Junction",
+    "state": "Rajasthan",
+    "zone": "WCR",
+    "latitude": 25.2138,
+    "longitude": 75.8648
+  },
+  {
+    "station_code": "RTM",
+    "station_name": "Ratlam Junction",
+    "state": "Madhya Pradesh",
+    "zone": "WR",
+    "latitude": 23.3441,
+    "longitude": 75.0352
+  },
+  {
+    "station_code": "BRC",
+    "station_name": "Vadodara Junction",
+    "state": "Gujarat",
+    "zone": "WR",
+    "latitude": 22.3107,
+    "longitude": 73.1812
+  },
+  {
+    "station_code": "ST",
+    "station_name": "Surat",
+    "state": "Gujarat",
+    "zone": "WR",
+    "latitude": 21.2049,
+    "longitude": 72.8406
+  },
+  {
+    "station_code": "BVI",
+    "station_name": "Borivali",
+    "state": "Maharashtra",
+    "zone": "WR",
+    "latitude": 19.2288,
+    "longitude": 72.8569
+  },
+  {
+    "station_code": "MMCT",
+    "station_name": "Mumbai Central",
+    "state": "Maharashtra",
+    "zone": "WR",
+    "latitude": 18.9696,
+    "longitude": 72.8193
+  },
+  {
+    "station_code": "CNB",
+    "station_name": "Kanpur Central",
+    "state": "Uttar Pradesh",
+    "zone": "NCR",
+    "latitude": 26.4547,
+    "longitude": 80.3507
+  },
+  {
+    "station_code": "PRYJ",
+    "station_name": "Prayagraj Junction",
+    "state": "Uttar Pradesh",
+    "zone": "NCR",
+    "latitude": 25.4447,
+    "longitude": 81.8333
+  },
+  {
+    "station_code": "DDU",
+    "station_name": "Pt Deen Dayal Upadhyaya Jn",
+    "state": "Uttar Pradesh",
+    "zone": "ECR",
+    "latitude": 25.2818,
+    "longitude": 83.1189
+  },
+  {
+    "station_code": "GAYA",
+    "station_name": "Gaya Junction",
+    "state": "Bihar",
+    "zone": "ECR",
+    "latitude": 24.7955,
+    "longitude": 84.9995
+  },
+  {
+    "station_code": "DHN",
+    "station_name": "Dhanbad Junction",
+    "state": "Jharkhand",
+    "zone": "ECR",
+    "latitude": 23.7957,
+    "longitude": 86.4304
+  },
+  {
+    "station_code": "ASN",
+    "station_name": "Asansol Junction",
+    "state": "West Bengal",
+    "zone": "ER",
+    "latitude": 23.6871,
+    "longitude": 86.9746
+  },
+  {
+    "station_code": "HWH",
+    "station_name": "Howrah Junction",
+    "state": "West Bengal",
+    "zone": "ER",
+    "latitude": 22.5839,
+    "longitude": 88.3426
+  },
+  {
+    "station_code": "BSB",
+    "station_name": "Varanasi Junction",
+    "state": "Uttar Pradesh",
+    "zone": "NR",
+    "latitude": 25.3283,
+    "longitude": 82.9863
+  }
+]

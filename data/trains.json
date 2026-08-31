@@ -1,0 +1,74 @@
+[
+  {
+    "train_number": "12002",
+    "train_name": "Bhopal Shatabdi Express",
+    "train_type": "Shatabdi",
+    "zone": "NR",
+    "origin": "NDLS",
+    "destination": "RKMP",
+    "route_corridor": "NDLS-RKMP"
+  },
+  {
+    "train_number": "20172",
+    "train_name": "Vande Bharat Express",
+    "train_type": "Vande Bharat",
+    "zone": "WCR",
+    "origin": "NZM",
+    "destination": "RKMP",
+    "route_corridor": "NZM-RKMP"
+  },
+  {
+    "train_number": "12952",
+    "train_name": "Mumbai Tejas Rajdhani",
+    "train_type": "Rajdhani",
+    "zone": "WR",
+    "origin": "NDLS",
+    "destination": "MMCT",
+    "route_corridor": "NDLS-MMCT"
+  },
+  {
+    "train_number": "12954",
+    "train_name": "August Kranti Rajdhani",
+    "train_type": "Rajdhani",
+    "zone": "WR",
+    "origin": "NZM",
+    "destination": "MMCT",
+    "route_corridor": "NZM-MMCT"
+  },
+  {
+    "train_number": "12302",
+    "train_name": "Howrah Rajdhani Express",
+    "train_type": "Rajdhani",
+    "zone": "ER",
+    "origin": "NDLS",
+    "destination": "HWH",
+    "route_corridor": "NDLS-HWH"
+  },
+  {
+    "train_number": "12260",
+    "train_name": "Sealdah Duronto Express",
+    "train_type": "Duronto",
+    "zone": "ER",
+    "origin": "NDLS",
+    "destination": "HWH",
+    "route_corridor": "NDLS-HWH"
+  },
+  {
+    "train_number": "22436",
+    "train_name": "Varanasi Vande Bharat Express",
+    "train_type": "Vande Bharat",
+    "zone": "NR",
+    "origin": "NDLS",
+    "destination": "BSB",
+    "route_corridor": "NDLS-BSB"
+  },
+  {
+    "train_number": "12560",
+    "train_name": "Shiv Ganga Express",
+    "train_type": "Superfast",
+    "zone": "NER",
+    "origin": "NDLS",
+    "destination": "BSB",
+    "route_corridor": "NDLS-BSB"
+  }
+]

@@ -1,0 +1,461 @@
+[
+  {
+    "train_number": "12002",
+    "station_code": "NDLS",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "MTJ",
+    "station_sequence": 2,
+    "scheduled_arrival": "07:45",
+    "scheduled_departure": "07:50",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "AGC",
+    "station_sequence": 3,
+    "scheduled_arrival": "08:32",
+    "scheduled_departure": "08:37",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "GWL",
+    "station_sequence": 4,
+    "scheduled_arrival": "09:55",
+    "scheduled_departure": "10:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "VGLJ",
+    "station_sequence": 5,
+    "scheduled_arrival": "11:08",
+    "scheduled_departure": "11:13",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "BINA",
+    "station_sequence": 6,
+    "scheduled_arrival": "13:08",
+    "scheduled_departure": "13:13",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "BPL",
+    "station_sequence": 7,
+    "scheduled_arrival": "14:53",
+    "scheduled_departure": "14:58",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12002",
+    "station_code": "RKMP",
+    "station_sequence": 8,
+    "scheduled_arrival": "15:10",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "20172",
+    "station_code": "NZM",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "20172",
+    "station_code": "AGC",
+    "station_sequence": 2,
+    "scheduled_arrival": "07:55",
+    "scheduled_departure": "08:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "20172",
+    "station_code": "GWL",
+    "station_sequence": 3,
+    "scheduled_arrival": "09:18",
+    "scheduled_departure": "09:23",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "20172",
+    "station_code": "VGLJ",
+    "station_sequence": 4,
+    "scheduled_arrival": "10:31",
+    "scheduled_departure": "10:36",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "20172",
+    "station_code": "BPL",
+    "station_sequence": 5,
+    "scheduled_arrival": "13:51",
+    "scheduled_departure": "13:56",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "20172",
+    "station_code": "RKMP",
+    "station_sequence": 6,
+    "scheduled_arrival": "14:08",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "NDLS",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "KOTA",
+    "station_sequence": 2,
+    "scheduled_arrival": "10:30",
+    "scheduled_departure": "10:35",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "RTM",
+    "station_sequence": 3,
+    "scheduled_arrival": "13:30",
+    "scheduled_departure": "13:35",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "BRC",
+    "station_sequence": 4,
+    "scheduled_arrival": "16:45",
+    "scheduled_departure": "16:50",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "ST",
+    "station_sequence": 5,
+    "scheduled_arrival": "18:25",
+    "scheduled_departure": "18:30",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "BVI",
+    "station_sequence": 6,
+    "scheduled_arrival": "21:10",
+    "scheduled_departure": "21:15",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12952",
+    "station_code": "MMCT",
+    "station_sequence": 7,
+    "scheduled_arrival": "21:50",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "NZM",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "MTJ",
+    "station_sequence": 2,
+    "scheduled_arrival": "07:35",
+    "scheduled_departure": "07:40",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "KOTA",
+    "station_sequence": 3,
+    "scheduled_arrival": "10:55",
+    "scheduled_departure": "11:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "RTM",
+    "station_sequence": 4,
+    "scheduled_arrival": "13:55",
+    "scheduled_departure": "14:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "BRC",
+    "station_sequence": 5,
+    "scheduled_arrival": "17:10",
+    "scheduled_departure": "17:15",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "ST",
+    "station_sequence": 6,
+    "scheduled_arrival": "18:50",
+    "scheduled_departure": "18:55",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "BVI",
+    "station_sequence": 7,
+    "scheduled_arrival": "21:35",
+    "scheduled_departure": "21:40",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12954",
+    "station_code": "MMCT",
+    "station_sequence": 8,
+    "scheduled_arrival": "22:15",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "NDLS",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "CNB",
+    "station_sequence": 2,
+    "scheduled_arrival": "10:40",
+    "scheduled_departure": "10:45",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "PRYJ",
+    "station_sequence": 3,
+    "scheduled_arrival": "12:55",
+    "scheduled_departure": "13:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "DDU",
+    "station_sequence": 4,
+    "scheduled_arrival": "14:50",
+    "scheduled_departure": "14:55",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "GAYA",
+    "station_sequence": 5,
+    "scheduled_arrival": "17:20",
+    "scheduled_departure": "17:25",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "DHN",
+    "station_sequence": 6,
+    "scheduled_arrival": "19:45",
+    "scheduled_departure": "19:50",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "ASN",
+    "station_sequence": 7,
+    "scheduled_arrival": "20:38",
+    "scheduled_departure": "20:43",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12302",
+    "station_code": "HWH",
+    "station_sequence": 8,
+    "scheduled_arrival": "23:03",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12260",
+    "station_code": "NDLS",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12260",
+    "station_code": "CNB",
+    "station_sequence": 2,
+    "scheduled_arrival": "10:40",
+    "scheduled_departure": "10:45",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12260",
+    "station_code": "PRYJ",
+    "station_sequence": 3,
+    "scheduled_arrival": "12:55",
+    "scheduled_departure": "13:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12260",
+    "station_code": "DDU",
+    "station_sequence": 4,
+    "scheduled_arrival": "14:50",
+    "scheduled_departure": "14:55",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12260",
+    "station_code": "DHN",
+    "station_sequence": 5,
+    "scheduled_arrival": "19:25",
+    "scheduled_departure": "19:30",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12260",
+    "station_code": "HWH",
+    "station_sequence": 6,
+    "scheduled_arrival": "22:30",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "22436",
+    "station_code": "NDLS",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "22436",
+    "station_code": "CNB",
+    "station_sequence": 2,
+    "scheduled_arrival": "10:40",
+    "scheduled_departure": "10:45",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "22436",
+    "station_code": "PRYJ",
+    "station_sequence": 3,
+    "scheduled_arrival": "12:55",
+    "scheduled_departure": "13:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "22436",
+    "station_code": "BSB",
+    "station_sequence": 4,
+    "scheduled_arrival": "14:30",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12560",
+    "station_code": "NDLS",
+    "station_sequence": 1,
+    "scheduled_arrival": null,
+    "scheduled_departure": "06:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12560",
+    "station_code": "CNB",
+    "station_sequence": 2,
+    "scheduled_arrival": "10:40",
+    "scheduled_departure": "10:45",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12560",
+    "station_code": "PRYJ",
+    "station_sequence": 3,
+    "scheduled_arrival": "12:55",
+    "scheduled_departure": "13:00",
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  },
+  {
+    "train_number": "12560",
+    "station_code": "BSB",
+    "station_sequence": 4,
+    "scheduled_arrival": "14:30",
+    "scheduled_departure": null,
+    "day_number": 1,
+    "distance_from_origin_km": 0.0
+  }
+]
