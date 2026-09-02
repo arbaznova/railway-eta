@@ -1,0 +1,280 @@
+/* ==========================================================================
+   BRUTALIST RAILWAY CONTROL ROOM DESIGN SYSTEM
+   High-contrast, bold geometry, hard offset shadows, technical monospace grids.
+   ========================================================================== */
+
+:root {
+  --bg-canvas: #f2efe9;
+  --bg-surface: #ffffff;
+  --bg-inverse: #0d0e12;
+  --border-color: #000000;
+  --border-width: 2.5px;
+  --shadow-hard: 4px 4px 0px #000000;
+  --shadow-hard-lg: 6px 6px 0px #000000;
+  --shadow-hard-sm: 2px 2px 0px #000000;
+  
+  /* Brutalist Industrial Accents */
+  --hazard-yellow: #FFE600;
+  --signal-green: #00F076;
+  --alert-red: #FF3B30;
+  --electric-cyan: #00D8F6;
+  --track-purple: #C850FE;
+  --caution-orange: #FF8800;
+
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-heading: 'Syne', 'Space Grotesk', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: #000000;
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  line-height: 1.4;
+  background-image: 
+    radial-gradient(#00000018 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* ================= UTILITY BRUTALIST CLASSES ================= */
+
+.b-card {
+  background: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-hard);
+  padding: 1rem;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.b-card-dark {
+  background: var(--bg-inverse);
+  color: #ffffff;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-hard);
+  padding: 1rem;
+}
+
+.b-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--bg-surface);
+  color: #000000;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-hard-sm);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.08s ease;
+}
+
+.b-button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
+}
+
+.b-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+.b-button-yellow {
+  background: var(--hazard-yellow);
+}
+.b-button-yellow:hover {
+  background: #ffeb3b;
+}
+
+.b-button-red {
+  background: var(--alert-red);
+  color: #ffffff;
+}
+
+.b-button-green {
+  background: var(--signal-green);
+}
+
+.b-button-cyan {
+  background: var(--electric-cyan);
+}
+
+.b-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border: 1.5px solid var(--border-color);
+  text-transform: uppercase;
+}
+
+.b-badge-yellow { background: var(--hazard-yellow); color: #000; }
+.b-badge-green { background: var(--signal-green); color: #000; }
+.b-badge-red { background: var(--alert-red); color: #fff; }
+.b-badge-cyan { background: var(--electric-cyan); color: #000; }
+.b-badge-purple { background: var(--track-purple); color: #fff; }
+.b-badge-dark { background: #000; color: #fff; }
+
+/* Hazard Stripes for Disruption Alerts */
+.hazard-stripe {
+  background: repeating-linear-gradient(
+    -45deg,
+    #000000,
+    #000000 12px,
+    var(--hazard-yellow) 12px,
+    var(--hazard-yellow) 24px
+  );
+  height: 8px;
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+.hazard-stripe-red {
+  background: repeating-linear-gradient(
+    -45deg,
+    #000000,
+    #000000 12px,
+    var(--alert-red) 12px,
+    var(--alert-red) 24px
+  );
+  height: 8px;
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+/* Pulsing Online Status Indicator */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid #000;
+  display: inline-block;
+}
+.status-dot-green {
+  background: var(--signal-green);
+  animation: pulse-green 1.6s infinite ease-in-out;
+}
+.status-dot-red {
+  background: var(--alert-red);
+}
+
+@keyframes pulse-green {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 6px var(--signal-green); }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* Data Table Brutalist Styling */
+.b-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.b-table th {
+  background: var(--bg-inverse);
+  color: #ffffff;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border: var(--border-width) solid var(--border-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.b-table td {
+  padding: 0.6rem 0.75rem;
+  border: var(--border-width) solid var(--border-color);
+  background: #ffffff;
+}
+
+.b-table tr:nth-child(even) td {
+  background: #faf8f5;
+}
+
+.b-table tr.completed td {
+  opacity: 0.6;
+  background: #ebe7df;
+}
+
+.b-table tr.active-target td {
+  background: #fff8d6;
+  font-weight: 700;
+}
+
+/* Form Controls */
+.b-select, .b-input {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.5rem 0.75rem;
+  border: var(--border-width) solid var(--border-color);
+  background: #ffffff;
+  color: #000000;
+  box-shadow: var(--shadow-hard-sm);
+  outline: none;
+  width: 100%;
+}
+
+.b-select:focus, .b-input:focus {
+  border-color: #000;
+  box-shadow: var(--shadow-hard);
+  background: #fffef0;
+}
+
+/* Range input */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  cursor: pointer;
+  background: #ffffff;
+  border: var(--border-width) solid #000000;
+  box-shadow: var(--shadow-hard-sm);
+}
+input[type=range]::-webkit-slider-thumb {
+  border: var(--border-width) solid #000000;
+  height: 24px;
+  width: 20px;
+  background: var(--hazard-yellow);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -8px;
+  box-shadow: 2px 2px 0px #000;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+  border: 1.5px solid #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000;
+  border: 1px solid #fff;
+}

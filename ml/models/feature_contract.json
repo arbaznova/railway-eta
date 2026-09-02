@@ -1,0 +1,43 @@
+{
+    "model_name": "eta_catboost_v1",
+    "model_type": "CatBoostRegressor",
+    "target": "residual_minutes",
+    "features": [
+        "geo_distance_km",
+        "scheduled_section_minutes",
+        "scheduled_hour",
+        "current_delay_minutes",
+        "previous_section_delay_minutes",
+        "rolling_delay_3_sections",
+        "historical_avg_delay_minutes",
+        "historical_ontime_pct",
+        "route_historical_ontime_pct",
+        "station_historical_delay_minutes",
+        "station_profile_available",
+        "avg_fog_risk_score",
+        "avg_zone_congestion_index",
+        "avg_season_severity_score",
+        "avg_psr_count",
+        "weather_severity",
+        "tsr_severity",
+        "congestion_level",
+        "trains_ahead",
+        "baseline_section_minutes"
+    ],
+    "feature_count": 20,
+    "prediction_logic": {
+        "model_output": "predicted_residual_minutes",
+        "final_section_prediction": "baseline_section_minutes + predicted_residual_minutes"
+    },
+    "excluded_columns": [
+        "record_id",
+        "scenario",
+        "section_id",
+        "train_number",
+        "train_name",
+        "from_station_code",
+        "to_station_code",
+        "actual_section_minutes",
+        "residual_minutes"
+    ]
+}

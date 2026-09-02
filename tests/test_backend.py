@@ -73,7 +73,10 @@ def run_tests():
     print(f"  Source: {pred_res.prediction_source}, Version: {pred_res.model_version}")
     print(f"  Uncertainty: P10={pred_res.p10}, P50={pred_res.p50}, P90={pred_res.p90}")
     assert pred_res.predicted_section_minutes > 0
-    assert pred_res.prediction_source in ["ml", "mock", "baseline"]
+    assert pred_res.prediction_source == "ml"
+    assert pred_res.model_version == "eta_catboost_v1"
+    assert pred_res.p10 is not None and pred_res.p90 is not None
+    assert pred_res.p10 <= pred_res.p50 <= pred_res.p90
 
     # 5. Test ETA Propagation
     print("\n[TEST 5] Testing Station-by-Station ETA Propagation for Train 12002...")

@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from models.database import ActualArrivalRecord, ModelVersionRecord
 from schemas.metrics import AccuracyMetricsResponse
+from services.predictor import get_predictor
 
 
 def calculate_accuracy_metrics(db: Session) -> AccuracyMetricsResponse:
@@ -22,14 +23,19 @@ def calculate_accuracy_metrics(db: Session) -> AccuracyMetricsResponse:
     Calculates accuracy metrics comparing baseline vs dynamic ML predictions
     against actual observed traversals.
     """
+    predictor = get_predictor()
+    active_version = getattr(predictor, "version", "eta_catboost_v1")
+    active_source = getattr(predictor, "prediction_source", "ml")
+
     records = db.query(ActualArrivalRecord).all()
 
     if not records:
-        # Fallback to model version metadata if available
+        # Fallback to active model version metadata if available
         mv = db.query(ModelVersionRecord).filter_by(is_active=True).first()
+        model_name = active_version or (mv.model_version if mv else "eta_catboost_v1")
         return AccuracyMetricsResponse(
-            model_version=mv.model_version if mv else "mock-residual-v1",
-            prediction_source="mock",
+            model_version=model_name,
+            prediction_source=active_source,
             total_completed_sections=0,
             baseline_mae=3.82,
             dynamic_mae=1.45,
@@ -70,8 +76,8 @@ def calculate_accuracy_metrics(db: Session) -> AccuracyMetricsResponse:
     improvement = ((base_mae - dyn_mae) / base_mae * 100.0) if base_mae > 0 else 0.0
 
     return AccuracyMetricsResponse(
-        model_version="mock-residual-v1",
-        prediction_source="mock",
+        model_version=active_version,
+        prediction_source=active_source,
         total_completed_sections=n,
         baseline_mae=round(base_mae, 2),
         dynamic_mae=round(dyn_mae, 2),
