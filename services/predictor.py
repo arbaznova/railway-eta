@@ -276,6 +276,12 @@ class ONNXPredictor(BasePredictor):
             p50_residual = float(p50_outputs[0].flatten()[0])
             p90_residual = float(p90_outputs[0].flatten()[0])
 
+            p10_residual, p50_residual, p90_residual = sorted([
+               p10_residual,
+               p50_residual,
+               p90_residual
+           ])
+
             # Section prediction = baseline + predicted residual
             predicted = round(max(sched_min * 0.70, baseline + residual), 2)
             p10 = round(max(sched_min * 0.70,baseline + p10_residual),2)
@@ -304,9 +310,9 @@ class ONNXPredictor(BasePredictor):
                 predicted_section_minutes=predicted,
                 prediction_source=self.prediction_source,
                 model_version=self.version,
-                p10=self.p10_session,
-                p50=self.p50_session,
-                p90=self.p90_session,
+                p10=p10,
+                p50=p50,
+                p90=p90,
                 explanation_factors=explanation_factors
             )
         except Exception as e:
