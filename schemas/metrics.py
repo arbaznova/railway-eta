@@ -18,5 +18,11 @@ class AccuracyMetricsResponse(BaseModel):
     dynamic_median_abs_error: float = 0.0
     baseline_p90_abs_error: float = 0.0
     dynamic_p90_abs_error: float = 0.0
+    baseline_mape: float = 0.0
+    dynamic_mape: float = 0.0
+    baseline_r2_score: float = 0.0
+    dynamic_r2_score: float = 0.0
+    baseline_tolerance_accuracy_2m: float = 0.0
+    dynamic_tolerance_accuracy_2m: float = 0.0
     improvement_percentage: float = 0.0
     status_note: str = "ML model is under training. Operating with high-fidelity deterministic mock residual engine."

@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/v1/trains", tags=["Trains"])
 @router.get("", response_model=List[TrainSummary])
 def get_active_trains(db: Session = Depends(get_db)):
     """Returns all active trains and their live state summary."""
-    trains = db.query(Train).all()
+    trains = db.query(Train).order_by(Train.train_number.asc()).all()
     results = []
 
     for t in trains:

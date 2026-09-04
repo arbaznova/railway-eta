@@ -1,29 +1,59 @@
 /* ==========================================================================
-   BRUTALIST RAILWAY CONTROL ROOM DESIGN SYSTEM
-   High-contrast, bold geometry, hard offset shadows, technical monospace grids.
+   MODERN SLEEK TRANSIT DESIGN SYSTEM (RailLive ETA)
+   Clean, intuitive, accessible transit aesthetic with soft rounded cards,
+   smooth elevations, vibrant status indicators, and responsive typography.
    ========================================================================== */
 
 :root {
-  --bg-canvas: #f2efe9;
+  --bg-canvas: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-inverse: #0d0e12;
-  --border-color: #000000;
-  --border-width: 2.5px;
-  --shadow-hard: 4px 4px 0px #000000;
-  --shadow-hard-lg: 6px 6px 0px #000000;
-  --shadow-hard-sm: 2px 2px 0px #000000;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-inverse: #0f172a;
   
-  /* Brutalist Industrial Accents */
-  --hazard-yellow: #FFE600;
-  --signal-green: #00F076;
-  --alert-red: #FF3B30;
-  --electric-cyan: #00D8F6;
-  --track-purple: #C850FE;
-  --caution-orange: #FF8800;
+  --border-color: #e2e8f0;
+  --border-subtle: #cbd5e1;
+  --border-width: 1px;
+  
+  /* Modern Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 15px rgba(2, 132, 199, 0.25);
 
-  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-heading: 'Syne', 'Space Grotesk', sans-serif;
+  /* Modern Transit Palette */
+  --brand-primary: #0284c7;
+  --brand-primary-hover: #0369a1;
+  --brand-primary-light: #e0f2fe;
+  --brand-primary-dark: #075985;
+  
+  --signal-green: #10b981;
+  --signal-green-light: #d1fae5;
+  --signal-green-text: #065f46;
+  
+  --hazard-yellow: #f59e0b;
+  --hazard-yellow-light: #fef3c7;
+  --hazard-yellow-text: #92400e;
+  
+  --alert-red: #ef4444;
+  --alert-red-light: #fee2e2;
+  --alert-red-text: #991b1b;
+  
+  --electric-cyan: #06b6d4;
+  --track-purple: #8b5cf6;
+  --caution-orange: #f97316;
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* Spacing & Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
 }
 
 * {
@@ -34,207 +64,274 @@
 
 body {
   background-color: var(--bg-canvas);
-  color: #000000;
-  font-family: var(--font-display);
+  color: #1e293b;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  line-height: 1.4;
-  background-image: 
-    radial-gradient(#00000018 1px, transparent 1px);
-  background-size: 16px 16px;
+  line-height: 1.5;
+  background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
 }
 
-/* ================= UTILITY BRUTALIST CLASSES ================= */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #0f172a;
+}
 
+/* ================= MODERN CARD SYSTEM ================= */
+
+.transit-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.transit-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Backward compatibility for .b-card */
 .b-card {
   background: var(--bg-surface);
-  border: var(--border-width) solid var(--border-color);
-  box-shadow: var(--shadow-hard);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   padding: 1rem;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.b-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
 }
 
 .b-card-dark {
   background: var(--bg-inverse);
-  color: #ffffff;
-  border: var(--border-width) solid var(--border-color);
-  box-shadow: var(--shadow-hard);
+  color: #f8fafc;
+  border: 1px solid #334155;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   padding: 1rem;
 }
+
+/* ================= MODERN BUTTONS ================= */
 
 .b-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--font-mono);
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.01em;
   background: var(--bg-surface);
-  color: #000000;
-  border: var(--border-width) solid var(--border-color);
-  box-shadow: var(--shadow-hard-sm);
-  padding: 0.5rem 1rem;
+  color: #1e293b;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  padding: 0.5rem 0.85rem;
   cursor: pointer;
   user-select: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.08s ease;
+  transition: all 0.15s ease;
 }
 
 .b-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-hard);
+  background: var(--bg-subtle);
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .b-button:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px #000000;
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .b-button-yellow {
   background: var(--hazard-yellow);
+  color: #78350f;
+  border-color: #f59e0b;
 }
 .b-button-yellow:hover {
-  background: #ffeb3b;
+  background: #d97706;
+  color: #fff;
 }
 
 .b-button-red {
   background: var(--alert-red);
   color: #ffffff;
+  border-color: #dc2626;
+}
+.b-button-red:hover {
+  background: #dc2626;
 }
 
 .b-button-green {
   background: var(--signal-green);
+  color: #ffffff;
+  border-color: #059669;
+}
+.b-button-green:hover {
+  background: #059669;
 }
 
 .b-button-cyan {
-  background: var(--electric-cyan);
+  background: var(--brand-primary);
+  color: #ffffff;
+  border-color: #0284c7;
 }
+.b-button-cyan:hover {
+  background: var(--brand-primary-hover);
+}
+
+/* ================= MODERN STATUS BADGES ================= */
 
 .b-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border: 1.5px solid var(--border-color);
-  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
 }
 
-.b-badge-yellow { background: var(--hazard-yellow); color: #000; }
-.b-badge-green { background: var(--signal-green); color: #000; }
-.b-badge-red { background: var(--alert-red); color: #fff; }
-.b-badge-cyan { background: var(--electric-cyan); color: #000; }
-.b-badge-purple { background: var(--track-purple); color: #fff; }
-.b-badge-dark { background: #000; color: #fff; }
-
-/* Hazard Stripes for Disruption Alerts */
-.hazard-stripe {
-  background: repeating-linear-gradient(
-    -45deg,
-    #000000,
-    #000000 12px,
-    var(--hazard-yellow) 12px,
-    var(--hazard-yellow) 24px
-  );
-  height: 8px;
-  border-bottom: var(--border-width) solid var(--border-color);
+.b-badge-yellow {
+  background: var(--hazard-yellow-light);
+  color: var(--hazard-yellow-text);
+  border-color: #fde68a;
 }
 
-.hazard-stripe-red {
-  background: repeating-linear-gradient(
-    -45deg,
-    #000000,
-    #000000 12px,
-    var(--alert-red) 12px,
-    var(--alert-red) 24px
-  );
-  height: 8px;
-  border-bottom: var(--border-width) solid var(--border-color);
+.b-badge-green {
+  background: var(--signal-green-light);
+  color: var(--signal-green-text);
+  border-color: #a7f3d0;
 }
 
-/* Pulsing Online Status Indicator */
+.b-badge-red {
+  background: var(--alert-red-light);
+  color: var(--alert-red-text);
+  border-color: #fecaca;
+}
+
+.b-badge-cyan {
+  background: var(--brand-primary-light);
+  color: var(--brand-primary-dark);
+  border-color: #bae6fd;
+}
+
+.b-badge-purple {
+  background: #ede9fe;
+  color: #5b21b6;
+  border-color: #ddd6fe;
+}
+
+.b-badge-dark {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+/* Modern Status Dot */
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 1.5px solid #000;
   display: inline-block;
 }
 .status-dot-green {
   background: var(--signal-green);
-  animation: pulse-green 1.6s infinite ease-in-out;
+  box-shadow: 0 0 0 2px var(--signal-green-light);
+  animation: pulse-green 2s infinite ease-in-out;
 }
 .status-dot-red {
   background: var(--alert-red);
+  box-shadow: 0 0 0 2px var(--alert-red-light);
 }
 
 @keyframes pulse-green {
-  0% { transform: scale(0.95); opacity: 0.7; }
-  50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 6px var(--signal-green); }
-  100% { transform: scale(0.95); opacity: 0.7; }
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Data Table Brutalist Styling */
+/* ================= MODERN DATA TABLES ================= */
+
 .b-table {
   width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-mono);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-body);
   font-size: 0.82rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 .b-table th {
-  background: var(--bg-inverse);
-  color: #ffffff;
+  background: #f8fafc;
+  color: #475569;
   text-align: left;
-  padding: 0.65rem 0.75rem;
-  border: var(--border-width) solid var(--border-color);
-  font-weight: 700;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
 .b-table td {
-  padding: 0.6rem 0.75rem;
-  border: var(--border-width) solid var(--border-color);
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-color);
   background: #ffffff;
+  color: #1e293b;
+}
+
+.b-table tr:last-child td {
+  border-bottom: none;
 }
 
 .b-table tr:nth-child(even) td {
-  background: #faf8f5;
+  background: #fafbfc;
 }
 
 .b-table tr.completed td {
-  opacity: 0.6;
-  background: #ebe7df;
+  opacity: 0.55;
+  background: #f1f5f9;
 }
 
 .b-table tr.active-target td {
-  background: #fff8d6;
-  font-weight: 700;
+  background: #fefce8;
+  font-weight: 600;
 }
 
-/* Form Controls */
+/* ================= FORM CONTROLS ================= */
+
 .b-select, .b-input {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 0.5rem 0.75rem;
-  border: var(--border-width) solid var(--border-color);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   background: #ffffff;
-  color: #000000;
-  box-shadow: var(--shadow-hard-sm);
+  color: #1e293b;
+  box-shadow: var(--shadow-sm);
   outline: none;
   width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .b-select:focus, .b-input:focus {
-  border-color: #000;
-  box-shadow: var(--shadow-hard);
-  background: #fffef0;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
 
 /* Range input */
@@ -248,33 +345,58 @@ input[type=range]:focus {
 }
 input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
-  height: 12px;
+  height: 6px;
   cursor: pointer;
-  background: #ffffff;
-  border: var(--border-width) solid #000000;
-  box-shadow: var(--shadow-hard-sm);
+  background: #e2e8f0;
+  border-radius: 9999px;
 }
 input[type=range]::-webkit-slider-thumb {
-  border: var(--border-width) solid #000000;
-  height: 24px;
-  width: 20px;
-  background: var(--hazard-yellow);
+  border: 2px solid #ffffff;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: var(--brand-primary);
   cursor: pointer;
   -webkit-appearance: none;
-  margin-top: -8px;
-  box-shadow: 2px 2px 0px #000;
+  margin-top: -6px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.1s ease;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
 /* Scrollbar Customization */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-canvas);
-  border: 1.5px solid #000;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #000000;
-  border: 1px solid #fff;
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ================= MODERN ANIMATIONS ================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(2, 132, 199, 0); }
+}
+
+.pulse-beacon {
+  animation: pulseGlow 2.5s infinite;
 }

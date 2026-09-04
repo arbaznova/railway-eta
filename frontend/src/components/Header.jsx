@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Radio, RefreshCw, FastForward, RotateCcw, ShieldCheck, Activity } from 'lucide-react';
+import {
+  Train, Radio, RefreshCw, FastForward, RotateCcw, ShieldCheck,
+  Activity, Target, Play, Pause, AlertCircle, Compass, LayoutDashboard
+} from 'lucide-react';
 
-export default function Header({ isConnected, onTick, onReset, isTicking }) {
+export default function Header({
+  isConnected,
+  onTick,
+  onReset,
+  isTicking,
+  trains = [],
+  selectedTrain,
+  onSelectTrain,
+  isSimPaused,
+  onTogglePlayPause,
+  activeMode = 'passenger',
+  onChangeMode
+}) {
   const [timeStr, setTimeStr] = useState('');
 
   useEffect(() => {
@@ -16,133 +31,170 @@ export default function Header({ isConnected, onTick, onReset, isTicking }) {
 
   return (
     <header style={{
-      background: 'var(--bg-inverse)',
+      background: '#0f172a',
       color: '#ffffff',
-      borderBottom: 'var(--border-width) solid var(--border-color)',
-      padding: '0.75rem 1.5rem',
+      borderBottom: '1px solid #1e293b',
+      padding: '0.65rem 1.25rem',
       display: 'flex',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
       alignItems: 'center',
-      gap: '1rem'
+      gap: '1rem',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
     }}>
-      {/* Brand Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      {/* Brand & Live Beacon */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
         <div style={{
-          background: 'var(--hazard-yellow)',
-          color: '#000000',
-          fontWeight: 900,
-          fontFamily: 'var(--font-heading)',
-          fontSize: '1.25rem',
-          padding: '0.3rem 0.75rem',
-          border: '2px solid #ffffff',
-          boxShadow: '3px 3px 0px #ffffff',
-          letterSpacing: '0.05em'
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.55rem',
+          background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+          color: '#ffffff',
+          fontWeight: 800,
+          fontSize: '1.05rem',
+          padding: '0.4rem 0.85rem',
+          borderRadius: '10px',
+          letterSpacing: '-0.01em',
+          boxShadow: '0 2px 8px rgba(2, 132, 199, 0.4)'
         }}>
-          RAIL-OPS // ETA
+          <Train size={18} />
+          <span>RailLive ETA</span>
         </div>
-        <div>
-          <h1 style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.95rem',
-            fontWeight: 800,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-            color: '#ffffff'
-          }}>
-            DYNAMIC RAILWAY ETA & DECISION SUPPORT SYSTEM
-          </h1>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.72rem',
-            color: '#a0a5b5',
-            display: 'flex',
-            gap: '0.75rem',
-            alignItems: 'center'
-          }}>
-            <span>SECTION-LEVEL PREDICTION</span>
-            <span>•</span>
-            <span style={{ color: 'var(--electric-cyan)' }}>RULE BASELINE + ML RESIDUAL</span>
-            <span>•</span>
-            <span style={{ color: 'var(--hazard-yellow)' }}>[v1.0-BRUTALIST]</span>
-          </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span className="status-dot status-dot-green" />
+          <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>
+            Live Northern Corridor
+          </span>
         </div>
       </div>
 
-      {/* Telemetry Status Badges */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+      {/* Center: High-Visibility Role Switcher */}
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        background: '#1e293b',
+        padding: '0.25rem',
+        borderRadius: '9999px',
+        border: '1px solid #334155'
+      }}>
+        <button
+          onClick={() => onChangeMode('passenger')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            padding: '0.45rem 1.1rem',
+            borderRadius: '9999px',
+            border: 'none',
+            background: activeMode === 'passenger' ? 'var(--brand-primary)' : 'transparent',
+            color: activeMode === 'passenger' ? '#ffffff' : '#94a3b8',
+            fontWeight: 700,
+            fontSize: '0.84rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: activeMode === 'passenger' ? '0 2px 8px rgba(2, 132, 199, 0.4)' : 'none'
+          }}
+        >
+          <Compass size={15} />
+          Passenger Tracker
+        </button>
+
+        <button
+          onClick={() => onChangeMode('dispatcher')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            padding: '0.45rem 1.1rem',
+            borderRadius: '9999px',
+            border: 'none',
+            background: activeMode === 'dispatcher' ? '#f59e0b' : 'transparent',
+            color: activeMode === 'dispatcher' ? '#000000' : '#94a3b8',
+            fontWeight: 700,
+            fontSize: '0.84rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: activeMode === 'dispatcher' ? '0 2px 8px rgba(245, 158, 11, 0.4)' : 'none'
+          }}
+        >
+          <LayoutDashboard size={15} />
+          Dispatcher Cockpit
+        </button>
+      </div>
+
+      {/* Right Controls Area */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
         {/* Live Clock */}
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontWeight: 800,
-          fontSize: '0.88rem',
-          background: '#1c1e24',
-          padding: '0.35rem 0.7rem',
-          border: '1.5px solid #444',
-          color: 'var(--hazard-yellow)'
+          fontWeight: 600,
+          fontSize: '0.82rem',
+          background: '#1e293b',
+          padding: '0.35rem 0.65rem',
+          borderRadius: '6px',
+          border: '1px solid #334155',
+          color: '#38bdf8'
         }}>
           {timeStr}
         </div>
 
-        {/* WebSocket Heartbeat */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.45rem',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
-          fontWeight: 800,
-          padding: '0.35rem 0.75rem',
-          border: '2px solid #ffffff',
-          background: isConnected ? '#052c17' : '#3d0a0a',
-          color: isConnected ? 'var(--signal-green)' : 'var(--alert-red)'
-        }}>
-          <span className={`status-dot ${isConnected ? 'status-dot-green' : 'status-dot-red'}`} />
-          {isConnected ? 'LIVE FEED: CONNECTED' : 'LIVE FEED: DISCONNECTED'}
-        </div>
+        {/* Dispatcher Mode Simulation Controls */}
+        {activeMode === 'dispatcher' && (
+          <>
+            {/* Simulation Status Tag */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              padding: '0.35rem 0.65rem',
+              borderRadius: '6px',
+              border: '1px solid #334155',
+              background: isSimPaused ? '#2b2300' : '#052c17',
+              color: isSimPaused ? 'var(--hazard-yellow)' : 'var(--signal-green)'
+            }}>
+              <span className={`status-dot ${isSimPaused ? 'status-dot-yellow' : 'status-dot-green'}`} style={{
+                background: isSimPaused ? 'var(--hazard-yellow)' : 'var(--signal-green)'
+              }} />
+              {isSimPaused ? 'SIM PAUSED' : 'AUTO RUNNING'}
+            </div>
 
-        {/* Predictor Mode Badge */}
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
-          fontWeight: 800,
-          padding: '0.35rem 0.75rem',
-          border: '2px solid #ffffff',
-          background: 'var(--electric-cyan)',
-          color: '#000000'
-        }}>
-          PREDICTOR: MOCK RESIDUAL (PLUGGABLE XGBOOST)
-        </div>
+            {/* Play/Pause & Step */}
+            <div style={{ display: 'flex', gap: '0.35rem' }}>
+              <button
+                onClick={onTogglePlayPause}
+                className={`b-button ${isSimPaused ? 'b-button-cyan' : 'b-button-yellow'}`}
+                style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
+                title={isSimPaused ? 'Resume auto-advancing simulation' : 'Pause automatic simulation time'}
+              >
+                {isSimPaused ? <Play size={13} /> : <Pause size={13} />}
+                {isSimPaused ? 'Resume' : 'Pause'}
+              </button>
 
-        {/* Simulation Controls */}
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
-          <button
-            onClick={() => onTick(60)}
-            disabled={isTicking}
-            className="b-button b-button-yellow"
-            style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
-            title="Advance simulation by 60 seconds"
-          >
-            <FastForward size={14} /> +60s TICK
-          </button>
-          <button
-            onClick={() => onTick(300)}
-            disabled={isTicking}
-            className="b-button b-button-yellow"
-            style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
-            title="Advance simulation by 5 minutes"
-          >
-            <FastForward size={14} /> +5m
-          </button>
-          <button
-            onClick={onReset}
-            className="b-button b-button-red"
-            style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
-            title="Reset active simulation and clear events"
-          >
-            <RotateCcw size={14} /> RESET
-          </button>
-        </div>
+              <button
+                onClick={() => onTick(60)}
+                disabled={isTicking}
+                className="b-button b-button-yellow"
+                style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
+                title="Advance simulation manually by 60 seconds"
+              >
+                <FastForward size={13} /> +60s
+              </button>
+
+              <button
+                onClick={onReset}
+                className="b-button b-button-red"
+                style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
+                title="Reset active simulation and clear events"
+              >
+                <RotateCcw size={13} /> Reset
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </header>
   );

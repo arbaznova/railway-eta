@@ -68,6 +68,9 @@ def propagate_train_eta(
     prediction_source = "mock"
     model_version = "mock-residual-v1"
 
+    # Running accumulated delay tracking across the corridor
+    running_delay = float(state.current_delay_minutes or 0.0)
+
     for i in range(len(schedules)):
         sched = schedules[i]
         st_code = sched.station_code
@@ -93,7 +96,7 @@ def propagate_train_eta(
         to_st = sched.station_code
         sec_id = f"{from_st}_{to_st}"
 
-        features = build_section_features(db, train_number, sec_id, to_st)
+        features = build_section_features(db, train_number, sec_id, to_st, current_delay_override=running_delay)
         pred = predictor.predict_section(features)
         prediction_source = pred.prediction_source
         model_version = pred.model_version
@@ -129,12 +132,17 @@ def propagate_train_eta(
         base_eta = format_time_delta(base_anchor_time, accumulated_baseline_min)
         dyn_eta = format_time_delta(base_anchor_time, accumulated_dynamic_min)
         p10_eta = format_time_delta(base_anchor_time, accumulated_p10_min)
-        p50_eta = format_time_delta(base_anchor_time,accumulated_p50_min)
+        p50_eta = format_time_delta(base_anchor_time, accumulated_p50_min)
         p90_eta = format_time_delta(base_anchor_time, accumulated_p90_min)
 
-        # Predicted delay = current accumulated delay + any operational delay added across upcoming sections
-        delay_added = max(0.0, (pred.predicted_section_minutes - pred.baseline_section_minutes) + (pred.baseline_section_minutes - features.get("scheduled_section_minutes", pred.baseline_section_minutes)))
-        pred_delay = round(state.current_delay_minutes + delay_added, 1)
+        # Accumulate delay downstream across all remaining route sections
+        # Delay variance = predicted section traversal minus scheduled traversal time
+        sched_sec_min = float(features.get("scheduled_section_minutes", pred.baseline_section_minutes)) * frac
+        sec_delay_delta = sec_dyn - sched_sec_min
+
+        # The delay accumulates down the corridor (increases if disruption, slightly recovers if clear, floor at 0)
+        running_delay = max(0.0, running_delay + sec_delay_delta)
+        pred_delay = round(running_delay, 1)
 
         upcoming_stations.append(StationETAResponse(
             station_code=to_st,

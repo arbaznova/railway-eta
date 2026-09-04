@@ -26,7 +26,8 @@ def build_section_features(
     db: Session,
     train_number: str,
     section_id: str,
-    target_station_code: Optional[str] = None
+    target_station_code: Optional[str] = None,
+    current_delay_override: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Constructs the exact 20-feature vector required by the ML prediction contract.
@@ -45,7 +46,7 @@ def build_section_features(
 
     # 2. Train Live Delay State
     state = db.query(TrainState).filter_by(train_number=train_number).first()
-    current_delay = state.current_delay_minutes if state else 0.0
+    current_delay = current_delay_override if current_delay_override is not None else (state.current_delay_minutes if state else 0.0)
     prev_delay = state.previous_section_delay_minutes if state else 0.0
     rolling_delay = state.rolling_delay_3_sections if state else 0.0
 

@@ -34,6 +34,31 @@ def inject_operational_event(event_in: OperationalEventCreate, db: Session = Dep
     return OperationalEventResponse.model_validate(event)
 
 
+@router.get("/status")
+def get_simulation_status():
+    """Returns the current operational status of the background simulation runner."""
+    return {
+        "is_running": simulator.is_running,
+        "is_paused": simulator.is_paused,
+        "tick_interval_seconds": simulator.tick_interval_seconds,
+        "sim_speed_factor": simulator.sim_speed_factor
+    }
+
+
+@router.post("/pause")
+def pause_simulation():
+    """Pauses automatic background simulation ticking."""
+    simulator.pause()
+    return {"status": "ok", "is_paused": True, "message": "Simulation auto-run paused."}
+
+
+@router.post("/resume")
+def resume_simulation():
+    """Resumes automatic background simulation ticking."""
+    simulator.resume()
+    return {"status": "ok", "is_paused": False, "message": "Simulation auto-run active."}
+
+
 @router.post("/tick")
 def step_simulation(seconds: float = 60.0, db: Session = Depends(get_db)):
     """
@@ -49,7 +74,10 @@ def reset_simulation(db: Session = Depends(get_db)):
     """
     Resets all trains back to origin with 0 delay and clears all active disruptions.
     """
-    # 1. Clear active operational events
+    # 1. Pause auto-run
+    simulator.pause()
+
+    # 2. Clear active operational events
     db.query(OperationalEvent).delete()
     db.query(AlertRecord).delete()
 

@@ -75,6 +75,28 @@ export async function resetSimulation() {
   return res.json();
 }
 
+export async function fetchSimulationStatus() {
+  const res = await fetch(`${API_BASE}/api/v1/simulation/status`);
+  if (!res.ok) throw new Error('Failed to fetch simulation status');
+  return res.json();
+}
+
+export async function pauseSimulation() {
+  const res = await fetch(`${API_BASE}/api/v1/simulation/pause`, {
+    method: 'POST'
+  });
+  if (!res.ok) throw new Error('Failed to pause simulation');
+  return res.json();
+}
+
+export async function resumeSimulation() {
+  const res = await fetch(`${API_BASE}/api/v1/simulation/resume`, {
+    method: 'POST'
+  });
+  if (!res.ok) throw new Error('Failed to resume simulation');
+  return res.json();
+}
+
 export function createWebSocketConnection(onMessage, onStatusChange) {
   let ws = null;
   let reconnectTimer = null;

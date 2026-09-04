@@ -31,6 +31,7 @@ class TrainSimulator:
         self.seed = seed
         self.rng = random.Random(seed)
         self.is_running = False
+        self.is_paused = True # Paused by default: trains will not auto-advance without user command
         self._task: Optional[asyncio.Task] = None
         self.tick_interval_seconds = 3.0 # loop interval
         self.sim_speed_factor = 20.0 # 1 real second = 20 sim seconds
@@ -176,21 +177,32 @@ class TrainSimulator:
     async def run_loop(self, broadcast_callback=None):
         """Continuous background simulation loop."""
         self.is_running = True
-        logger.info("Railway Train Simulator loop started.")
+        logger.info("Railway Train Simulator loop started (is_paused=%s).", self.is_paused)
         while self.is_running:
-            try:
-                db = SessionLocal()
+            if not self.is_paused:
                 try:
-                    sim_elapsed = self.tick_interval_seconds * self.sim_speed_factor
-                    updates = self.tick(db, elapsed_seconds=sim_elapsed)
-                    if broadcast_callback and updates:
-                        await broadcast_callback({"type": "TRAIN_UPDATES", "data": updates})
-                finally:
-                    db.close()
-            except Exception as e:
-                logger.error(f"Simulator tick exception: {e}")
+                    db = SessionLocal()
+                    try:
+                        sim_elapsed = self.tick_interval_seconds * self.sim_speed_factor
+                        updates = self.tick(db, elapsed_seconds=sim_elapsed)
+                        if broadcast_callback and updates:
+                            await broadcast_callback({"type": "TRAIN_UPDATES", "data": updates})
+                    finally:
+                        db.close()
+                except Exception as e:
+                    logger.error(f"Simulator tick exception: {e}")
 
             await asyncio.sleep(self.tick_interval_seconds)
+
+    def pause(self):
+        """Pauses the automatic simulation background ticks."""
+        self.is_paused = True
+        logger.info("Simulation auto-run paused.")
+
+    def resume(self):
+        """Resumes the automatic simulation background ticks."""
+        self.is_paused = False
+        logger.info("Simulation auto-run resumed.")
 
     def start(self, broadcast_callback=None):
         if not self.is_running:
