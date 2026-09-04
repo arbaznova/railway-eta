@@ -2,8 +2,33 @@
  * Backend API Client & WebSocket Connector
  */
 
-const API_BASE = 'http://localhost:8000';
-const WS_BASE = 'ws://localhost:8000';
+function getApiBase() {
+  if (import.meta.env.VITE_API_BASE !== undefined) {
+    return import.meta.env.VITE_API_BASE;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return '';
+    }
+  }
+  return 'http://localhost:8000';
+}
+
+function getWsBase() {
+  if (import.meta.env.VITE_WS_BASE !== undefined) {
+    return import.meta.env.VITE_WS_BASE;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${protocol}//${window.location.host}`;
+    }
+  }
+  return 'ws://localhost:8000';
+}
+
+const API_BASE = getApiBase();
+const WS_BASE = getWsBase();
 
 export async function fetchTrains() {
   const res = await fetch(`${API_BASE}/api/v1/trains`);

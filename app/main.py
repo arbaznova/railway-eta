@@ -9,8 +9,10 @@ Configures:
 """
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from models.database import init_db, SessionLocal, Train, OperationalEvent
 from services.simulator import simulator
@@ -63,16 +65,8 @@ app.include_router(simulation_router)
 app.include_router(websocket_router)
 
 
-@app.get("/")
-def root():
-    return {
-        "service": "Dynamic Railway ETA Prediction & Decision Support Agent",
-        "status": "online",
-        "docs": "/docs",
-        "health": "/health",
-        "api_prefix": "/api/v1"
-    }
-
+# Mount Static Frontend SPA if dist directory exists (e.g., in Docker container / unified build)
+STATIC_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 @app.get("/health")
 def health_check():
@@ -105,3 +99,18 @@ def health_check():
             "fallback_available": True
         }
     }
+
+
+# Mount Static Frontend SPA if dist directory exists (e.g. in Docker unified deployment)
+if STATIC_DIR.exists() and (STATIC_DIR / "index.html").exists():
+    app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
+else:
+    @app.get("/")
+    def root():
+        return {
+            "service": "Dynamic Railway ETA Prediction & Decision Support Agent",
+            "status": "online",
+            "docs": "/docs",
+            "health": "/health",
+            "api_prefix": "/api/v1"
+        }

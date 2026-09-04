@@ -17,15 +17,48 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
+
+# Automatically load environment variables from .env if present
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / ".env")
+except ImportError:
+    env_file = BASE_DIR / ".env"
+    if env_file.exists():
+        with open(env_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    k, v = k.strip(), v.strip().strip("'\"")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'rail_eda.db'}")
 
-# SQLite specific connect args for concurrency
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+# Normalize PostgreSQL dialect if provided as postgres://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Connection args and pooling configuration
+connect_args = {}
+engine_kwargs = {"echo": False}
+
+if DATABASE_URL.startswith("sqlite"):
+    connect_args["check_same_thread"] = False
+else:
+    # Managed PostgreSQL (Supabase / Render) pool tuning
+    engine_kwargs.update({
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    })
 
 engine = create_engine(
     DATABASE_URL,
     connect_args=connect_args,
-    echo=False
+    **engine_kwargs
 )
 
 # Enable WAL mode for SQLite
