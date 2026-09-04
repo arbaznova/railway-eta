@@ -62,6 +62,7 @@ def propagate_train_eta(
     accumulated_baseline_min = 0.0
     accumulated_dynamic_min = 0.0
     accumulated_p10_min = 0.0
+    accumulated_p50_min = 0.0
     accumulated_p90_min = 0.0
 
     prediction_source = "mock"
@@ -114,18 +115,21 @@ def propagate_train_eta(
 
         sec_base = pred.baseline_section_minutes * frac
         sec_dyn = pred.predicted_section_minutes * frac
-        sec_p10 = (pred.p10 or pred.predicted_section_minutes) * frac
-        sec_p90 = (pred.p90 or pred.predicted_section_minutes) * frac
+        sec_p10 = (pred.p10 if pred.p10 is not None else pred.predicted_section_minutes) * frac
+        sec_p50 = (pred.p50 if pred.p50 is not None else pred.predicted_section_minutes) * frac
+        sec_p90 = (pred.p90 if pred.p90 is not None else pred.predicted_section_minutes) * frac
 
         accumulated_baseline_min += sec_base
         accumulated_dynamic_min += sec_dyn
         accumulated_p10_min += sec_p10
+        accumulated_p50_min += sec_p50
         accumulated_p90_min += sec_p90
 
         # Calculate arrival ETAs
         base_eta = format_time_delta(base_anchor_time, accumulated_baseline_min)
         dyn_eta = format_time_delta(base_anchor_time, accumulated_dynamic_min)
         p10_eta = format_time_delta(base_anchor_time, accumulated_p10_min)
+        p50_eta = format_time_delta(base_anchor_time,accumulated_p50_min)
         p90_eta = format_time_delta(base_anchor_time, accumulated_p90_min)
 
         # Predicted delay = current accumulated delay + any operational delay added across upcoming sections
@@ -141,7 +145,7 @@ def propagate_train_eta(
             dynamic_eta=dyn_eta,
             predicted_delay_minutes=max(0.0, pred_delay),
             p10_eta=p10_eta,
-            p50_eta=dyn_eta,
+            p50_eta=p50_eta,
             p90_eta=p90_eta,
             is_completed=False
         ))

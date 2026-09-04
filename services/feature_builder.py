@@ -29,7 +29,7 @@ def build_section_features(
     target_station_code: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Constructs the exact 19-feature vector required by the ML prediction contract.
+    Constructs the exact 20-feature vector required by the ML prediction contract.
     """
     # 1. Static Section & Topology Features
     sec = db.query(RouteSection).filter_by(section_id=section_id).first()

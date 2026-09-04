@@ -21,7 +21,12 @@ logger = logging.getLogger(__name__)
 
 # Primary ONNX model path and contract
 ROOT_DIR = Path(__file__).resolve().parent.parent
-ONNX_MODEL_FILE = ROOT_DIR / "ml" / "models" / "eta_catboost_v1.onnx"
+ONNX_MODEL_FILE = ROOT_DIR / "ml" / "models" / "eta_xgboost_v1.onnx"
+
+P10_MODEL_FILE = ROOT_DIR / "ml" / "models" / "eta_xgboost_p10_v1.onnx"
+P50_MODEL_FILE = ROOT_DIR / "ml" / "models" / "eta_xgboost_p50_v1.onnx"
+P90_MODEL_FILE = ROOT_DIR / "ml" / "models" / "eta_xgboost_p90_v1.onnx"
+
 FEATURE_CONTRACT_FILE = ROOT_DIR / "ml" / "models" / "feature_contract.json"
 
 # Fallback paths
@@ -146,7 +151,7 @@ class MockPredictor(BasePredictor):
 
 class ONNXPredictor(BasePredictor):
     """
-    Production ONNX runtime predictor loading trained model artifacts (e.g. eta_catboost_v1.onnx).
+    Production ONNX runtime predictor loading trained model artifacts (e.g. eta_xgboost_v1.onnx).
     Conforms to the 20-feature contract and applies residual correction:
         final_section_prediction = max(sched * 0.85, baseline_section_minutes + predicted_residual_minutes)
     Provides operational uncertainty bounds (P10/P50/P90) and human-interpretable factor weights.
@@ -155,8 +160,14 @@ class ONNXPredictor(BasePredictor):
         self.model_path = model_path
         self.contract_path = contract_path
         self.session = None
-        self.input_name = "features"
-        self.version = "eta_catboost_v1"
+        self.p10_session = None
+        self.p50_session = None
+        self.p90_session = None
+        self.input_name = "input"
+        self.p10_input_name = "input"
+        self.p50_input_name = "input"
+        self.p90_input_name = "input"
+        self.version = "eta_xgboost_v1"
         self.prediction_source = "ml"
         self.feature_order: List[str] = DEFAULT_FEATURE_ORDER
         self._fallback_predictor = MockPredictor(version="mock-fallback-v1")
@@ -177,25 +188,61 @@ class ONNXPredictor(BasePredictor):
                 logger.warning(f"Could not load feature contract {self.contract_path}: {e}")
 
     def _load_session(self):
-        if not self.model_path.exists():
-            logger.warning(f"ONNX model not found at {self.model_path}. Inference will fallback.")
-            return
+      if not self.model_path.exists():
+        logger.warning(
+            f"ONNX model not found at {self.model_path}. Inference will fallback."
+        )
+        return
 
-        try:
-            import onnxruntime as ort
-            # Configure session options for fast single-sample / low-latency inference
-            sess_options = ort.SessionOptions()
-            sess_options.intra_op_num_threads = 1
-            sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-            sess_options.log_severity_level = 3  # Suppress harmless output shape mismatch warnings
-            self.session = ort.InferenceSession(str(self.model_path), sess_options=sess_options)
-            inputs = self.session.get_inputs()
-            if inputs:
-                self.input_name = inputs[0].name
-            logger.info(f"ONNX InferenceSession loaded successfully from {self.model_path} (input: {self.input_name})")
-        except Exception as e:
-            logger.error(f"Failed to load ONNX model {self.model_path}: {e}")
-            self.session = None
+      try:
+        import onnxruntime as ort
+
+        sess_options = ort.SessionOptions()
+        sess_options.intra_op_num_threads = 1
+        sess_options.graph_optimization_level = (
+            ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        )
+        sess_options.log_severity_level = 3
+
+        # Main point model
+        self.session = ort.InferenceSession(
+            str(self.model_path),
+            sess_options=sess_options
+        )
+
+        # Quantile models
+        self.p10_session = ort.InferenceSession(
+            str(P10_MODEL_FILE),
+            sess_options=sess_options
+        )
+
+        self.p50_session = ort.InferenceSession(
+            str(P50_MODEL_FILE),
+            sess_options=sess_options
+        )
+
+        self.p90_session = ort.InferenceSession(
+            str(P90_MODEL_FILE),
+            sess_options=sess_options
+        )
+
+        # Read actual ONNX input names
+        self.input_name = self.session.get_inputs()[0].name
+        self.p10_input_name = self.p10_session.get_inputs()[0].name
+        self.p50_input_name = self.p50_session.get_inputs()[0].name
+        self.p90_input_name = self.p90_session.get_inputs()[0].name
+
+        logger.info(
+            "XGBoost Point + P10 + P50 + P90 ONNX models loaded successfully."
+        )
+
+      except Exception as e:
+        logger.error(f"Failed to load ONNX models: {e}")
+
+        self.session = None
+        self.p10_session = None
+        self.p50_session = None
+        self.p90_session = None
 
     def predict_section(self, features: Dict[str, Any]) -> PredictionResponse:
         baseline = float(features.get("baseline_section_minutes", 10.0))
@@ -221,8 +268,25 @@ class ONNXPredictor(BasePredictor):
             raw_residual = float(outputs[0].flatten()[0])
             residual = round(raw_residual, 2)
 
+            p10_outputs = self.p10_session.run(None,{self.p10_input_name: input_tensor})
+            p50_outputs = self.p50_session.run(None,{self.p50_input_name: input_tensor})
+            p90_outputs = self.p90_session.run(None,{self.p90_input_name: input_tensor})
+            
+            p10_residual = float(p10_outputs[0].flatten()[0])
+            p50_residual = float(p50_outputs[0].flatten()[0])
+            p90_residual = float(p90_outputs[0].flatten()[0])
+
+            p10_residual, p50_residual, p90_residual = sorted([
+               p10_residual,
+               p50_residual,
+               p90_residual
+           ])
+
             # Section prediction = baseline + predicted residual
-            predicted = round(max(sched_min * 0.85, baseline + residual), 2)
+            predicted = round(max(sched_min * 0.70, baseline + residual), 2)
+            p10 = round(max(sched_min * 0.70,baseline + p10_residual),2)
+            p50 = round(max(sched_min * 0.70,baseline + p50_residual),2)
+            p90 = round(max(sched_min * 0.70,baseline + p90_residual),2)
 
             # Volatility-adjusted uncertainty bounds
             weather = float(features.get("weather_severity", 0.0))
@@ -230,12 +294,6 @@ class ONNXPredictor(BasePredictor):
             cong = float(features.get("congestion_level", 0.0))
             trains_ahead = int(features.get("trains_ahead", 0))
 
-            volatility = (weather * 2.2 + tsr * 2.8 + cong * 1.8 + trains_ahead * 0.4 + 1.0)
-            uncertainty_spread = max(1.2, round(volatility, 2))
-
-            p10 = round(max(sched_min * 0.85, predicted - uncertainty_spread), 2)
-            p50 = predicted
-            p90 = round(predicted + uncertainty_spread * 1.3, 2)
 
             explanation_factors = {
                 "model_residual_minutes": residual,
