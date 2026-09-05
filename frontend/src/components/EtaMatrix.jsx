@@ -63,7 +63,7 @@ export default function EtaMatrix({ etaData, trainDetail }) {
               <th style={{ background: 'var(--border-color)', color: 'var(--hazard-yellow)' }}>
                 DYNAMIC ETA (ML)
               </th>
-              <th>DELAY FORECAST</th>
+              <th title="Predicted delay beyond scheduled timetable arrival time">DELAY FORECAST</th>
               <th>UNCERTAINTY [P10 — P90]</th>
               <th>STATUS</th>
             </tr>
@@ -71,7 +71,19 @@ export default function EtaMatrix({ etaData, trainDetail }) {
           <tbody>
             {upcomingStops.map((stop, idx) => {
               const isDone = stop.is_completed;
-              const delay = stop.predicted_delay_minutes || 0;
+              // Delay forecast from scheduled timetable time
+              let delay = stop.predicted_delay_minutes ?? 0;
+              if (!isDone && delay === 0 && stop.dynamic_eta && (stop.scheduled_arrival || stop.scheduled_departure)) {
+                const sched = stop.scheduled_arrival || stop.scheduled_departure;
+                const [h1, m1] = stop.dynamic_eta.split(':').map(Number);
+                const [h2, m2] = sched.split(':').map(Number);
+                if (!isNaN(h1) && !isNaN(h2)) {
+                  let diff = (h1 * 60 + m1) - (h2 * 60 + m2);
+                  if (diff < -720) diff += 1440;
+                  else if (diff > 720) diff -= 1440;
+                  delay = Math.max(0, diff);
+                }
+              }
               const isNext = !isDone && upcomingStops.slice(0, idx).every(s => s.is_completed);
 
               return (

@@ -9,7 +9,7 @@ Implements:
 5. Generation of human-readable explanation factors for operations.
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
@@ -27,6 +27,24 @@ def format_time_delta(base_time: datetime, added_minutes: float) -> str:
     return dt.strftime("%H:%M")
 
 
+def add_minutes_to_time(time_str: Optional[str], added_minutes: float) -> Optional[str]:
+    """Helper to add minutes to an HH:MM time string, wrapping at 24 hours."""
+    if not time_str:
+        return time_str
+    try:
+        parts = time_str.split(":")
+        h, m = int(parts[0]), int(parts[1])
+        total_mins = h * 60 + m + added_minutes
+        new_h = int((total_mins // 60) % 24)
+        new_m = int(round(total_mins % 60))
+        if new_m >= 60:
+            new_m = 0
+            new_h = (new_h + 1) % 24
+        return f"{new_h:02d}:{new_m:02d}"
+    except Exception:
+        return time_str
+
+
 def propagate_train_eta(
     db: Session,
     train_number: str,
@@ -34,6 +52,7 @@ def propagate_train_eta(
 ) -> TrainETAResponse:
     """
     Computes station-by-station baseline and dynamic ETAs for a train.
+    Calculates delay forecast as delay from scheduled timetable time.
     """
     train = db.query(Train).filter_by(train_number=train_number).first()
     state = db.query(TrainState).filter_by(train_number=train_number).first()
@@ -47,7 +66,6 @@ def propagate_train_eta(
     predictor = get_predictor()
 
     now_utc = datetime.now(timezone.utc)
-    base_anchor_time = now_utc
 
     upcoming_stations: List[StationETAResponse] = []
     explanation_summary: List[str] = []
@@ -59,22 +77,18 @@ def propagate_train_eta(
             curr_seq = s.station_sequence
             break
 
-    accumulated_baseline_min = 0.0
-    accumulated_dynamic_min = 0.0
-    accumulated_p10_min = 0.0
-    accumulated_p50_min = 0.0
-    accumulated_p90_min = 0.0
-
     prediction_source = "mock"
     model_version = "mock-residual-v1"
 
-    # Running accumulated delay tracking across the corridor
+    # Running accumulated delay tracking across the corridor (delay beyond schedule)
     running_delay = float(state.current_delay_minutes or 0.0)
+    running_base_delay = float(state.current_delay_minutes or 0.0)
 
     for i in range(len(schedules)):
         sched = schedules[i]
         st_code = sched.station_code
         st_name = stations_dict.get(st_code, st_code)
+        sched_time = sched.scheduled_arrival or sched.scheduled_departure
 
         if sched.station_sequence <= curr_seq:
             # Already completed station
@@ -83,8 +97,8 @@ def propagate_train_eta(
                 station_name=st_name,
                 scheduled_arrival=sched.scheduled_arrival,
                 scheduled_departure=sched.scheduled_departure,
-                baseline_eta=sched.scheduled_arrival,
-                dynamic_eta=sched.scheduled_arrival,
+                baseline_eta=sched_time,
+                dynamic_eta=sched_time,
                 predicted_delay_minutes=0.0,
                 is_completed=True
             ))
@@ -118,31 +132,32 @@ def propagate_train_eta(
 
         sec_base = pred.baseline_section_minutes * frac
         sec_dyn = pred.predicted_section_minutes * frac
-        sec_p10 = (pred.p10 if pred.p10 is not None else pred.predicted_section_minutes) * frac
-        sec_p50 = (pred.p50 if pred.p50 is not None else pred.predicted_section_minutes) * frac
-        sec_p90 = (pred.p90 if pred.p90 is not None else pred.predicted_section_minutes) * frac
-
-        accumulated_baseline_min += sec_base
-        accumulated_dynamic_min += sec_dyn
-        accumulated_p10_min += sec_p10
-        accumulated_p50_min += sec_p50
-        accumulated_p90_min += sec_p90
-
-        # Calculate arrival ETAs
-        base_eta = format_time_delta(base_anchor_time, accumulated_baseline_min)
-        dyn_eta = format_time_delta(base_anchor_time, accumulated_dynamic_min)
-        p10_eta = format_time_delta(base_anchor_time, accumulated_p10_min)
-        p50_eta = format_time_delta(base_anchor_time, accumulated_p50_min)
-        p90_eta = format_time_delta(base_anchor_time, accumulated_p90_min)
 
         # Accumulate delay downstream across all remaining route sections
         # Delay variance = predicted section traversal minus scheduled traversal time
         sched_sec_min = float(features.get("scheduled_section_minutes", pred.baseline_section_minutes)) * frac
         sec_delay_delta = sec_dyn - sched_sec_min
+        sec_base_delta = sec_base - sched_sec_min
 
         # The delay accumulates down the corridor (increases if disruption, slightly recovers if clear, floor at 0)
         running_delay = max(0.0, running_delay + sec_delay_delta)
+        running_base_delay = max(0.0, running_base_delay + sec_base_delta)
         pred_delay = round(running_delay, 1)
+        base_delay = round(running_base_delay, 1)
+
+        # Calculate arrival ETAs anchored to scheduled timetable time + accumulated delay
+        base_eta = add_minutes_to_time(sched_time, base_delay)
+        dyn_eta = add_minutes_to_time(sched_time, pred_delay)
+
+        # Quantile uncertainty spreads anchored to scheduled time
+        p10_spread = max(0.0, (pred.predicted_section_minutes - (pred.p10 if pred.p10 is not None else pred.predicted_section_minutes)) * frac)
+        p90_spread = max(0.0, ((pred.p90 if pred.p90 is not None else pred.predicted_section_minutes) - pred.predicted_section_minutes) * frac)
+        p10_delay = max(0.0, pred_delay - p10_spread)
+        p90_delay = pred_delay + p90_spread
+
+        p10_eta = add_minutes_to_time(sched_time, p10_delay)
+        p50_eta = dyn_eta
+        p90_eta = add_minutes_to_time(sched_time, p90_delay)
 
         upcoming_stations.append(StationETAResponse(
             station_code=to_st,

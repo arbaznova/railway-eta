@@ -6,6 +6,7 @@ Supports SQLite (default) and PostgreSQL with SQLAlchemy.
 import os
 import json
 import csv
+import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Generator
@@ -34,11 +35,59 @@ except ImportError:
                     if k and k not in os.environ:
                         os.environ[k] = v
 
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'rail_eda.db'}")
+def clean_database_url(url: str) -> str:
+    """
+    Sanitize and normalize DATABASE_URL for SQLAlchemy:
+    - Strips whitespace, newlines, and surrounding quotes.
+    - Replaces postgres:// with postgresql://.
+    - Automatically URL-encodes special characters in password (e.g. @, #) if needed.
+    """
+    if not url:
+        return url
+    url = url.strip().strip("'\"")
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
 
-# Normalize PostgreSQL dialect if provided as postgres://
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    if url.startswith("sqlite"):
+        return url
+
+    # Test if SQLAlchemy can parse it as-is
+    try:
+        from sqlalchemy.engine import make_url
+        make_url(url)
+        return url
+    except Exception:
+        pass
+
+    # If parsing failed, handle unencoded special characters in password:
+    # URL format: driver://username:password@host:port/database
+    if "://" in url and "@" in url:
+        try:
+            scheme, rest = url.split("://", 1)
+            last_at_idx = rest.rfind("@")
+            if last_at_idx != -1:
+                creds = rest[:last_at_idx]
+                host_path = rest[last_at_idx + 1:]
+                if ":" in creds:
+                    user, raw_pass = creds.split(":", 1)
+                    # Unquote first to prevent double-encoding, then percent-encode
+                    unquoted = urllib.parse.unquote(raw_pass)
+                    encoded_pass = urllib.parse.quote_plus(unquoted)
+                    fixed_url = f"{scheme}://{user}:{encoded_pass}@{host_path}"
+                    return fixed_url
+        except Exception:
+            pass
+
+    return url
+
+
+DATABASE_URL = clean_database_url(os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'rail_eda.db'}"))
+
+# If using Supabase connection pooler, use port 6543 (Transaction mode)
+# and NullPool to prevent (EMAXCONNSESSION) 15-client limit exhaustion
+if "pooler.supabase.com" in DATABASE_URL:
+    if ":5432/" in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace(":5432/", ":6543/")
 
 # Connection args and pooling configuration
 connect_args = {}
@@ -46,11 +95,15 @@ engine_kwargs = {"echo": False}
 
 if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
+elif "pooler.supabase.com" in DATABASE_URL:
+    from sqlalchemy.pool import NullPool
+    engine_kwargs["poolclass"] = NullPool
+    engine_kwargs["pool_pre_ping"] = True
 else:
-    # Managed PostgreSQL (Supabase / Render) pool tuning
+    # Managed PostgreSQL (Direct / Render) pool tuning
     engine_kwargs.update({
-        "pool_size": 10,
-        "max_overflow": 20,
+        "pool_size": 5,
+        "max_overflow": 5,
         "pool_pre_ping": True,
         "pool_recycle": 300,
     })

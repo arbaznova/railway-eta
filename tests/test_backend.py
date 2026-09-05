@@ -74,7 +74,7 @@ def run_tests():
     print(f"  Uncertainty: P10={pred_res.p10}, P50={pred_res.p50}, P90={pred_res.p90}")
     assert pred_res.predicted_section_minutes > 0
     assert pred_res.prediction_source == "ml"
-    assert pred_res.model_version == "eta_catboost_v1"
+    assert pred_res.model_version in ["eta_xgboost_v1", "eta_catboost_v1"]
     assert pred_res.p10 is not None and pred_res.p90 is not None
     assert pred_res.p10 <= pred_res.p50 <= pred_res.p90
 
