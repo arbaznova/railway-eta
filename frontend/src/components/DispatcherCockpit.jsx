@@ -1,8 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import {
-  Activity, Map, Table, ShieldAlert,
-  Train, Clock, AlertTriangle, CheckCircle, Zap
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { Map, Table, ShieldAlert } from 'lucide-react';
 import CorridorMap from './CorridorMap';
 import TrainRoster from './TrainRoster';
 import EtaMatrix from './EtaMatrix';
@@ -23,24 +20,6 @@ export default function DispatcherCockpit({
 }) {
   const [activeTab, setActiveTab] = useState('OPERATIONS'); // 'OPERATIONS' | 'ETA' | 'DISRUPTIONS'
 
-  // Network health KPIs
-  const kpis = useMemo(() => {
-    const total = trains.length;
-    if (total === 0) return { total: 0, onTimePercent: 100, avgDelay: 0, activeAlerts: alerts.length };
-
-    const onTimeCount = trains.filter((t) => (t.delay_minutes || 0) <= 5).length;
-    const onTimePercent = Math.round((onTimeCount / total) * 100);
-    const totalDelay = trains.reduce((acc, t) => acc + (t.delay_minutes || 0), 0);
-    const avgDelay = (totalDelay / total).toFixed(1);
-
-    return {
-      total,
-      onTimePercent,
-      avgDelay,
-      activeAlerts: alerts.length
-    };
-  }, [trains, alerts]);
-
   return (
     <div style={{
       display: 'flex',
@@ -52,108 +31,6 @@ export default function DispatcherCockpit({
       margin: '0 auto',
       width: '100%'
     }}>
-      {/* Top Operational KPI Status Strip */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '0.85rem'
-      }}>
-        {/* KPI 1: Active Trains */}
-        <div className="transit-card" style={{ padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: 'var(--brand-primary-light)',
-            color: 'var(--brand-primary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Train size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-              Active Trains
-            </div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
-              {kpis.total} <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600 }}>Tracking</span>
-            </div>
-          </div>
-        </div>
-
-        {/* KPI 2: On-Time Performance */}
-        <div className="transit-card" style={{ padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: kpis.onTimePercent >= 80 ? '#d1fae5' : '#fef3c7',
-            color: kpis.onTimePercent >= 80 ? '#059669' : '#d97706',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <CheckCircle size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-              On-Time Rate
-            </div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
-              {kpis.onTimePercent}% <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 500 }}>(within 5m)</span>
-            </div>
-          </div>
-        </div>
-
-        {/* KPI 3: Average Delay */}
-        <div className="transit-card" style={{ padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: Number(kpis.avgDelay) > 15 ? '#fee2e2' : '#f0fdf4',
-            color: Number(kpis.avgDelay) > 15 ? '#dc2626' : '#16a34a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Clock size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-              Average Delay
-            </div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
-              {kpis.avgDelay} <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 500 }}>mins / train</span>
-            </div>
-          </div>
-        </div>
-
-        {/* KPI 4: Active Alerts */}
-        <div className="transit-card" style={{ padding: '0.85rem 1.15rem', display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: kpis.activeAlerts > 0 ? '#fef3c7' : '#f1f5f9',
-            color: kpis.activeAlerts > 0 ? '#d97706' : '#64748b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <AlertTriangle size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-              Active Disruptions
-            </div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
-              {kpis.activeAlerts} <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 500 }}>Corridor Alerts</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Tab Navigation Controls */}
       <div style={{
@@ -250,7 +127,7 @@ export default function DispatcherCockpit({
             gap: '1.25rem',
             alignItems: 'start'
           }}>
-            <div style={{ height: 'calc(100vh - 250px)', overflowY: 'auto' }}>
+            <div style={{ height: 'calc(100vh - 170px)', overflowY: 'auto' }}>
               <TrainRoster
                 trains={trains}
                 selectedTrain={selectedTrain}
@@ -262,7 +139,7 @@ export default function DispatcherCockpit({
               display: 'flex',
               flexDirection: 'column',
               gap: '1.25rem',
-              height: 'calc(100vh - 250px)',
+              height: 'calc(100vh - 170px)',
               overflowY: 'auto'
             }}>
               <CorridorMap
