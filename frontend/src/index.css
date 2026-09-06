@@ -337,6 +337,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Range input */
 input[type=range] {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   background: transparent;
 }

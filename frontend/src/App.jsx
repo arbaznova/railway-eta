@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import PassengerView from './components/PassengerView';
 import DispatcherCockpit from './components/DispatcherCockpit';
@@ -23,7 +23,41 @@ export default function App() {
   const [isInjecting, setIsInjecting] = useState(false);
   const [isSimPaused, setIsSimPaused] = useState(true);
 
-  // Load all initial data
+  // Keep a ref to the selected train to prevent stale async callbacks from overwriting ETA
+  const selectedTrainNumberRef = useRef(selectedTrainNumber);
+  useEffect(() => {
+    selectedTrainNumberRef.current = selectedTrainNumber;
+  }, [selectedTrainNumber]);
+
+  // Load selected train details & ETA with strict identity verification
+  const loadTrainData = useCallback(async (trainNum) => {
+    if (!trainNum) return;
+    try {
+      const [detail, eta] = await Promise.all([
+        fetchTrainDetail(trainNum),
+        fetchTrainETA(trainNum)
+      ]);
+      // Strict guard: only update state if this is STILL the user's selected train
+      if (selectedTrainNumberRef.current === trainNum) {
+        setTrainDetail(detail);
+        setTrainETA(eta);
+      }
+    } catch (err) {
+      console.error(`Error loading train ${trainNum} data`, err);
+    }
+  }, []);
+
+  // Explicit user train selection handler - clears old ETA immediately to prevent showing previous train
+  const handleSelectTrain = useCallback((trainNum) => {
+    if (!trainNum || trainNum === selectedTrainNumberRef.current) return;
+    setSelectedTrainNumber(trainNum);
+    selectedTrainNumberRef.current = trainNum;
+    setTrainDetail(null);
+    setTrainETA(null);
+    loadTrainData(trainNum);
+  }, [loadTrainData]);
+
+  // Load all initial data once on mount
   const loadInitialData = useCallback(async () => {
     try {
       const [tList, secList, altList, metList, simStatus] = await Promise.all([
@@ -41,29 +75,17 @@ export default function App() {
         setIsSimPaused(simStatus.is_paused);
       }
 
-      // Default selection fallback if 12002 not present
-      if (tList && tList.length > 0 && !tList.some(t => t.train_number === selectedTrainNumber)) {
-        setSelectedTrainNumber(tList[0].train_number);
+      // Default selection fallback if 12002 not present only on initial load
+      if (tList && tList.length > 0 && !tList.some(t => t.train_number === selectedTrainNumberRef.current)) {
+        const defaultNum = tList[0].train_number;
+        setSelectedTrainNumber(defaultNum);
+        selectedTrainNumberRef.current = defaultNum;
+        loadTrainData(defaultNum);
       }
     } catch (err) {
       console.error('Error loading initial data', err);
     }
-  }, [selectedTrainNumber]);
-
-  // Load selected train details & ETA
-  const loadTrainData = useCallback(async (trainNum) => {
-    if (!trainNum) return;
-    try {
-      const [detail, eta] = await Promise.all([
-        fetchTrainDetail(trainNum),
-        fetchTrainETA(trainNum)
-      ]);
-      setTrainDetail(detail);
-      setTrainETA(eta);
-    } catch (err) {
-      console.error(`Error loading train ${trainNum} data`, err);
-    }
-  }, []);
+  }, [loadTrainData]);
 
   useEffect(() => {
     loadInitialData();
@@ -73,7 +95,7 @@ export default function App() {
     loadTrainData(selectedTrainNumber);
   }, [selectedTrainNumber, loadTrainData]);
 
-  // WebSocket setup
+  // WebSocket setup - updates active train ETA without re-binding connection on every train switch
   useEffect(() => {
     const cleanup = createWebSocketConnection(
       (msg) => {
@@ -85,8 +107,8 @@ export default function App() {
               return update ? { ...t, ...update } : t;
             })
           );
-          // Refresh active train ETA and metrics
-          loadTrainData(selectedTrainNumber);
+          // Refresh ONLY the currently selected train's ETA and global metrics
+          loadTrainData(selectedTrainNumberRef.current);
           fetchAccuracyMetrics().then(setMetrics).catch(() => {});
           fetchAlerts().then(setAlerts).catch(() => {});
         }
@@ -95,7 +117,7 @@ export default function App() {
     );
 
     return cleanup;
-  }, [selectedTrainNumber, loadTrainData]);
+  }, [loadTrainData]);
 
   // Periodic polling fallback (every 4s) with stable order preservation
   useEffect(() => {
@@ -117,19 +139,21 @@ export default function App() {
       fetchSections().then(setSections).catch(() => {});
       fetchAlerts().then(setAlerts).catch(() => {});
       fetchAccuracyMetrics().then(setMetrics).catch(() => {});
-      loadTrainData(selectedTrainNumber);
+      loadTrainData(selectedTrainNumberRef.current);
     }, 4000);
 
     return () => clearInterval(pollInterval);
-  }, [selectedTrainNumber, loadTrainData]);
+  }, [loadTrainData]);
 
   // Simulation tick handler
   const handleTick = async (seconds = 60) => {
     setIsTicking(true);
     try {
       await stepSimulation(seconds);
-      await loadInitialData();
-      await loadTrainData(selectedTrainNumber);
+      const [secList, altList] = await Promise.all([fetchSections(), fetchAlerts()]);
+      setSections(secList);
+      setAlerts(altList);
+      await loadTrainData(selectedTrainNumberRef.current);
     } catch (err) {
       alert(`Simulation tick failed: ${err.message}`);
     } finally {
@@ -172,7 +196,7 @@ export default function App() {
       const [secList, altList] = await Promise.all([fetchSections(), fetchAlerts()]);
       setSections(secList);
       setAlerts(altList);
-      await loadTrainData(selectedTrainNumber);
+      await loadTrainData(selectedTrainNumberRef.current);
     } finally {
       setIsInjecting(false);
     }
@@ -195,7 +219,7 @@ export default function App() {
         isTicking={isTicking}
         trains={trains}
         selectedTrain={selectedTrain}
-        onSelectTrain={setSelectedTrainNumber}
+        onSelectTrain={handleSelectTrain}
         isSimPaused={isSimPaused}
         onTogglePlayPause={handleTogglePlayPause}
         activeMode={activeMode}
@@ -215,14 +239,14 @@ export default function App() {
             selectedTrain={selectedTrain}
             trainDetail={trainDetail}
             trainETA={trainETA}
-            onSelectTrain={setSelectedTrainNumber}
+            onSelectTrain={handleSelectTrain}
             alerts={alerts}
           />
         ) : (
           <DispatcherCockpit
             trains={trains}
             selectedTrain={selectedTrain}
-            onSelectTrain={setSelectedTrainNumber}
+            onSelectTrain={handleSelectTrain}
             trainDetail={trainDetail}
             trainETA={trainETA}
             sections={sections}

@@ -295,6 +295,7 @@ export default function DispatcherCockpit({
               <EtaMatrix
                 etaData={trainETA}
                 trainDetail={trainDetail}
+                selectedTrain={selectedTrain}
               />
             </div>
           </div>
@@ -306,6 +307,7 @@ export default function DispatcherCockpit({
             <EtaMatrix
               etaData={trainETA}
               trainDetail={trainDetail}
+              selectedTrain={selectedTrain}
             />
           </div>
         )}

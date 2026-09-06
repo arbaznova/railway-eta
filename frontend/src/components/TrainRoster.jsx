@@ -9,28 +9,34 @@ export default function TrainRoster({ trains = [], selectedTrain, onSelectTrain 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMode, setFilterMode] = useState('ALL'); // 'ALL' | 'DELAYED' | 'ON_TIME'
   const [sortBy, setSortBy] = useState('NUMBER_ASC'); // 'NUMBER_ASC' | 'DELAY_DESC' | 'DELAY_ASC' | 'NAME_ASC' | 'SPEED_DESC'
-  const [pinSelected, setPinSelected] = useState(true);
+  const [pinSelected, setPinSelected] = useState(false);
   const [isFrozen, setIsFrozen] = useState(false);
 
   // Counts for filter pills
   const delayedCount = useMemo(() => trains.filter(t => (t.current_delay_minutes || 0) > 0.5).length, [trains]);
   const onTimeCount = useMemo(() => trains.filter(t => (t.current_delay_minutes || 0) <= 0.5).length, [trains]);
 
-  // Filter & Search
-  const filteredTrains = useMemo(() => {
-    let result = [...trains];
+  // Keep a stable ordered list of train IDs so telemetry updates do NOT shuffle cards around
+  const [orderedTrainNumbers, setOrderedTrainNumbers] = useState([]);
+
+  // Establish or re-sort train order only on explicit user filter/sort change or when fleet size changes
+  useMemo(() => {
+    if (isFrozen && orderedTrainNumbers.length > 0) return;
+    if (!trains || trains.length === 0) return;
+
+    let list = [...trains];
 
     // Filter by delay
     if (filterMode === 'DELAYED') {
-      result = result.filter(t => (t.current_delay_minutes || 0) > 0.5);
+      list = list.filter(t => (t.current_delay_minutes || 0) > 0.5);
     } else if (filterMode === 'ON_TIME') {
-      result = result.filter(t => (t.current_delay_minutes || 0) <= 0.5);
+      list = list.filter(t => (t.current_delay_minutes || 0) <= 0.5);
     }
 
     // Filter by search term
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase().trim();
-      result = result.filter(t =>
+      list = list.filter(t =>
         t.train_number.toLowerCase().includes(q) ||
         t.train_name.toLowerCase().includes(q) ||
         t.origin.toLowerCase().includes(q) ||
@@ -39,9 +45,8 @@ export default function TrainRoster({ trains = [], selectedTrain, onSelectTrain 
       );
     }
 
-    // Sorting (Deterministic / Stable)
-    result.sort((a, b) => {
-      // If pinSelected is enabled, keep selected train at top of this list
+    // Deterministic Sort
+    list.sort((a, b) => {
       if (pinSelected && selectedTrain) {
         if (a.train_number === selectedTrain.train_number) return -1;
         if (b.train_number === selectedTrain.train_number) return 1;
@@ -65,8 +70,25 @@ export default function TrainRoster({ trains = [], selectedTrain, onSelectTrain 
       return a.train_number.localeCompare(b.train_number);
     });
 
+    setOrderedTrainNumbers(list.map(t => t.train_number));
+  }, [filterMode, searchTerm, sortBy, pinSelected, trains.length, isFrozen]);
+
+  // Map latest live train telemetry into the stable slots
+  const filteredTrains = useMemo(() => {
+    const map = new Map(trains.map(t => [t.train_number, t]));
+    const result = [];
+    for (const num of orderedTrainNumbers) {
+      const t = map.get(num);
+      if (t) result.push(t);
+    }
+    // Fallback for any newly added trains
+    for (const t of trains) {
+      if (!orderedTrainNumbers.includes(t.train_number)) {
+        result.push(t);
+      }
+    }
     return result;
-  }, [trains, filterMode, searchTerm, sortBy, pinSelected, selectedTrain]);
+  }, [trains, orderedTrainNumbers]);
 
   // Prev / Next train navigation helpers
   const currentIndex = trains.findIndex(t => t.train_number === selectedTrain?.train_number);

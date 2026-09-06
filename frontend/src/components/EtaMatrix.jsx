@@ -1,11 +1,15 @@
 import React from 'react';
 import { Clock, Cpu, ShieldAlert, Sparkles, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 
-export default function EtaMatrix({ etaData, trainDetail }) {
-  if (!etaData) {
+export default function EtaMatrix({ etaData, trainDetail, selectedTrain }) {
+  // Strict identity guard: never show mismatched or previous train's matrix
+  const isDataMatching = etaData && (!selectedTrain || etaData.train_number === selectedTrain.train_number);
+
+  if (!isDataMatching) {
+    const targetLabel = selectedTrain ? `${selectedTrain.train_name} (${selectedTrain.train_number})` : 'FOCUSED TRAIN';
     return (
       <div className="b-card" style={{ padding: '2rem', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
-        [LOADING STATION-BY-STATION ETA MATRIX...]
+        [SYNCING LIVE ML ETA MATRIX FOR {targetLabel}...]
       </div>
     );
   }
