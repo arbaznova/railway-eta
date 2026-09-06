@@ -6,10 +6,14 @@ from typing import Dict, Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from models.database import get_db, OperationalEvent, TrainState, TrainSchedule, ActualArrivalRecord, AlertRecord
+from models.database import (
+    get_db, OperationalEvent, TrainState, TrainSchedule, ActualArrivalRecord, AlertRecord,
+    INITIAL_TRAIN_CONFIGS
+)
 from schemas.events import OperationalEventCreate, OperationalEventResponse
 from services.event_normalizer import normalize_and_store_event
 from services.simulator import simulator
+from services.alerts import check_and_generate_alerts
 
 router = APIRouter(prefix="/api/v1/simulation", tags=["Simulation"])
 
@@ -81,23 +85,27 @@ def reset_simulation(db: Session = Depends(get_db)):
     db.query(OperationalEvent).delete()
     db.query(AlertRecord).delete()
 
-    # 2. Reset train positions
+    # 2. Reset train positions and delays back to initial seeded state
     states = db.query(TrainState).all()
     for state in states:
         scheds = db.query(TrainSchedule).filter_by(train_number=state.train_number).order_by(TrainSchedule.station_sequence).all()
         if len(scheds) >= 2:
             first_st = scheds[0].station_code
             second_st = scheds[1].station_code
+            cfg = INITIAL_TRAIN_CONFIGS.get(state.train_number, {"delay_minutes": 0.0, "progress_ratio": 0.15, "speed_kmh": 90.0})
+            init_delay = cfg["delay_minutes"]
+            ratio = cfg.get("progress_ratio", 0.15)
             state.current_station_code = first_st
             state.next_station_code = second_st
             state.current_section_id = f"{first_st}_{second_st}"
-            state.progress_ratio = 0.05
-            state.position_km = 5.0
-            state.current_delay_minutes = 0.0
-            state.previous_section_delay_minutes = 0.0
-            state.rolling_delay_3_sections = 0.0
-            state.speed_kmh = 90.0
+            state.progress_ratio = ratio
+            state.position_km = round(ratio * 50.0, 1)
+            state.current_delay_minutes = init_delay
+            state.previous_section_delay_minutes = round(init_delay * 0.4, 2) if init_delay > 0 else 0.0
+            state.rolling_delay_3_sections = init_delay
+            state.speed_kmh = cfg.get("speed_kmh", 90.0)
             state.status = "RUNNING"
 
     db.commit()
-    return {"status": "ok", "message": "Simulation state and operational events reset successfully."}
+    check_and_generate_alerts(db)
+    return {"status": "ok", "message": "Simulation state, initial delays, and operational events reset successfully."}

@@ -57,7 +57,7 @@ export default function PassengerView({
   }, [upcomingStops]);
 
   // Delay stats
-  const delayMinutes = selectedTrain?.delay_minutes || 0;
+  const delayMinutes = selectedTrain?.current_delay_minutes ?? selectedTrain?.delay_minutes ?? 0;
   const isDelayed = delayMinutes > 5;
   const isSeverelyDelayed = delayMinutes > 25;
 
@@ -147,7 +147,7 @@ export default function PassengerView({
           </span>
           {filteredTrains.map((t) => {
             const isSelected = selectedTrain?.train_number === t.train_number;
-            const tDelay = t.delay_minutes || 0;
+            const tDelay = t.current_delay_minutes ?? t.delay_minutes ?? 0;
             return (
               <button
                 key={t.train_number}

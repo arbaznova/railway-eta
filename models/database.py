@@ -316,6 +316,23 @@ class ModelVersionRecord(Base):
 
 # ----------------- Database Init & Seeding -----------------
 
+# Realistic initial operational states seeded for demo trains
+# Aligns with historical delays in train_historical_profiles.csv:
+# - Vande Bharat trains maintained near on-time (priority corridors)
+# - Shatabdi & Rajdhani with realistic minor/moderate delays
+# - Long-distance Superfast/Duronto with accumulated delays (triggers corridor alerts)
+INITIAL_TRAIN_CONFIGS = {
+    "20172": {"delay_minutes": 0.0, "progress_ratio": 0.25, "speed_kmh": 110.0},
+    "22436": {"delay_minutes": 2.0, "progress_ratio": 0.35, "speed_kmh": 105.0},
+    "12002": {"delay_minutes": 12.0, "progress_ratio": 0.18, "speed_kmh": 90.0},
+    "12952": {"delay_minutes": 16.0, "progress_ratio": 0.22, "speed_kmh": 92.0},
+    "12954": {"delay_minutes": 22.0, "progress_ratio": 0.30, "speed_kmh": 72.0},
+    "12560": {"delay_minutes": 25.0, "progress_ratio": 0.15, "speed_kmh": 68.0},
+    "12302": {"delay_minutes": 28.0, "progress_ratio": 0.40, "speed_kmh": 70.0},
+    "12260": {"delay_minutes": 32.0, "progress_ratio": 0.28, "speed_kmh": 65.0},
+}
+
+
 def init_db():
     """Create tables if they don't exist and seed reference data."""
     Base.metadata.create_all(bind=engine)
@@ -441,7 +458,7 @@ def seed_database_if_empty():
         ))
         db.commit()
 
-        # 9. Seed Initial Train States for 8 demo trains
+        # 9. Seed Initial Train States for 8 demo trains with realistic initial delays
         trains = db.query(Train).all()
         for t in trains:
             # find first section and stations
@@ -450,22 +467,32 @@ def seed_database_if_empty():
                 curr_st = scheds[0].station_code
                 next_st = scheds[1].station_code
                 sec_id = f"{curr_st}_{next_st}"
+                cfg = INITIAL_TRAIN_CONFIGS.get(t.train_number, {"delay_minutes": 0.0, "progress_ratio": 0.15, "speed_kmh": 90.0})
+                init_delay = cfg["delay_minutes"]
+                ratio = cfg.get("progress_ratio", 0.15)
                 db.add(TrainState(
                     train_number=t.train_number,
                     current_section_id=sec_id,
                     current_station_code=curr_st,
                     next_station_code=next_st,
-                    progress_ratio=0.15,
-                    position_km=10.0,
-                    current_delay_minutes=0.0,
-                    previous_section_delay_minutes=0.0,
-                    rolling_delay_3_sections=0.0,
-                    speed_kmh=95.0,
+                    progress_ratio=ratio,
+                    position_km=round(ratio * 50.0, 1),
+                    current_delay_minutes=init_delay,
+                    previous_section_delay_minutes=round(init_delay * 0.4, 2) if init_delay > 0 else 0.0,
+                    rolling_delay_3_sections=init_delay,
+                    speed_kmh=cfg.get("speed_kmh", 90.0),
                     status="RUNNING",
                     sequence_number=1,
                     last_updated=datetime.now(timezone.utc)
                 ))
         db.commit()
+
+        # 10. Generate initial alerts for delayed trains
+        try:
+            from services.alerts import check_and_generate_alerts
+            check_and_generate_alerts(db)
+        except Exception:
+            pass
 
     finally:
         db.close()
