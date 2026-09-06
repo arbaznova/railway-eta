@@ -22,6 +22,15 @@ from models.database import (
 from services.baseline import calculate_baseline_section_time
 
 
+# In-memory cache for static tables that never change at runtime
+_STATIC_CACHE: Dict[str, Any] = {
+    "sections": {},
+    "section_features": {},
+    "train_hist": {},
+    "station_hist": {}
+}
+
+
 def build_section_features(
     db: Session,
     train_number: str,
@@ -32,9 +41,14 @@ def build_section_features(
     """
     Constructs the exact 20-feature vector required by the ML prediction contract.
     """
-    # 1. Static Section & Topology Features
-    sec = db.query(RouteSection).filter_by(section_id=section_id).first()
-    sec_feat = db.query(SectionFeature).filter_by(section_id=section_id).first()
+    # 1. Static Section & Topology Features (cached to prevent repeated network hops)
+    if section_id not in _STATIC_CACHE["sections"]:
+        _STATIC_CACHE["sections"][section_id] = db.query(RouteSection).filter_by(section_id=section_id).first()
+    sec = _STATIC_CACHE["sections"][section_id]
+
+    if section_id not in _STATIC_CACHE["section_features"]:
+        _STATIC_CACHE["section_features"][section_id] = db.query(SectionFeature).filter_by(section_id=section_id).first()
+    sec_feat = _STATIC_CACHE["section_features"][section_id]
 
     geo_distance_km = sec.geo_distance_km if sec else 50.0
     scheduled_section_minutes = sec.scheduled_section_minutes if sec else 40.0
@@ -50,15 +64,19 @@ def build_section_features(
     prev_delay = state.previous_section_delay_minutes if state else 0.0
     rolling_delay = state.rolling_delay_3_sections if state else 0.0
 
-    # 3. Train Historical Profile
-    t_hist = db.query(TrainHistorical).filter_by(train_number=train_number).first()
+    # 3. Train Historical Profile (cached)
+    if train_number not in _STATIC_CACHE["train_hist"]:
+        _STATIC_CACHE["train_hist"][train_number] = db.query(TrainHistorical).filter_by(train_number=train_number).first()
+    t_hist = _STATIC_CACHE["train_hist"][train_number]
     hist_avg_delay = t_hist.historical_avg_delay_minutes if t_hist else 15.0
     hist_ontime_pct = t_hist.historical_ontime_pct if t_hist else 80.0
     route_ontime_pct = t_hist.route_historical_ontime_pct if t_hist else 78.0
 
-    # 4. Station Historical Profile
+    # 4. Station Historical Profile (cached)
     st_code = target_station_code or (sec.to_station if sec else "NDLS")
-    st_hist = db.query(StationHistorical).filter_by(station_code=st_code).first()
+    if st_code not in _STATIC_CACHE["station_hist"]:
+        _STATIC_CACHE["station_hist"][st_code] = db.query(StationHistorical).filter_by(station_code=st_code).first()
+    st_hist = _STATIC_CACHE["station_hist"][st_code]
     station_hist_delay = st_hist.station_historical_delay_minutes if st_hist else 10.0
     station_profile_avail = st_hist.station_profile_available if st_hist else 1
 

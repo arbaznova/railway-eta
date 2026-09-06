@@ -14,7 +14,6 @@ export default function PassengerView({
   alerts = []
 }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('ALL'); // 'ALL' | 'ON_TIME' | 'DELAYED'
   const [showAllStops, setShowAllStops] = useState(true);
 
   // Filtered train list for search & chips
@@ -28,14 +27,9 @@ export default function PassengerView({
         (t.origin_station && t.origin_station.toLowerCase().includes(query)) ||
         (t.destination_station && t.destination_station.toLowerCase().includes(query));
 
-      if (!matchesQuery) return false;
-
-      const delay = t.delay_minutes || 0;
-      if (activeFilter === 'ON_TIME') return delay <= 5;
-      if (activeFilter === 'DELAYED') return delay > 5;
-      return true;
+      return matchesQuery;
     });
-  }, [trains, searchQuery, activeFilter]);
+  }, [trains, searchQuery]);
 
   // Relevant advisories for selected train
   const relevantAlerts = useMemo(() => {
@@ -96,7 +90,7 @@ export default function PassengerView({
           {/* Search Box */}
           <div style={{
             position: 'relative',
-            flex: '1 1 300px',
+            width: '100%',
             display: 'flex',
             alignItems: 'center'
           }}>
@@ -130,58 +124,6 @@ export default function PassengerView({
                 ✕
               </button>
             )}
-          </div>
-
-          {/* Quick Filter Badges */}
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <button
-              onClick={() => setActiveFilter('ALL')}
-              style={{
-                padding: '0.35rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid',
-                borderColor: activeFilter === 'ALL' ? 'var(--brand-primary)' : '#e2e8f0',
-                background: activeFilter === 'ALL' ? 'var(--brand-primary-light)' : '#ffffff',
-                color: activeFilter === 'ALL' ? 'var(--brand-primary-dark)' : '#475569',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                cursor: 'pointer'
-              }}
-            >
-              All Trains ({trains.length})
-            </button>
-            <button
-              onClick={() => setActiveFilter('ON_TIME')}
-              style={{
-                padding: '0.35rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid',
-                borderColor: activeFilter === 'ON_TIME' ? '#10b981' : '#e2e8f0',
-                background: activeFilter === 'ON_TIME' ? '#d1fae5' : '#ffffff',
-                color: activeFilter === 'ON_TIME' ? '#065f46' : '#475569',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                cursor: 'pointer'
-              }}
-            >
-              🟢 On Time
-            </button>
-            <button
-              onClick={() => setActiveFilter('DELAYED')}
-              style={{
-                padding: '0.35rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid',
-                borderColor: activeFilter === 'DELAYED' ? '#f59e0b' : '#e2e8f0',
-                background: activeFilter === 'DELAYED' ? '#fef3c7' : '#ffffff',
-                color: activeFilter === 'DELAYED' ? '#92400e' : '#475569',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                cursor: 'pointer'
-              }}
-            >
-              🟡 Delayed
-            </button>
           </div>
         </div>
 

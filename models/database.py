@@ -96,9 +96,14 @@ engine_kwargs = {"echo": False}
 if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 elif "pooler.supabase.com" in DATABASE_URL:
-    from sqlalchemy.pool import NullPool
-    engine_kwargs["poolclass"] = NullPool
-    engine_kwargs["pool_pre_ping"] = True
+    # Use a small warm connection pool for Supabase Transaction Pooler (port 6543)
+    # Keeping connections warm eliminates ~300ms TLS handshake lag on every single query
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 5,
+        "pool_pre_ping": True,
+        "pool_recycle": 180,
+    })
 else:
     # Managed PostgreSQL (Direct / Render) pool tuning
     engine_kwargs.update({

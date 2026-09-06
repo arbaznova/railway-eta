@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Activity, Map, Table, ShieldAlert, BarChart3,
+  Activity, Map, Table, ShieldAlert,
   Train, Clock, AlertTriangle, CheckCircle, Zap
 } from 'lucide-react';
 import CorridorMap from './CorridorMap';
@@ -8,7 +8,6 @@ import TrainRoster from './TrainRoster';
 import EtaMatrix from './EtaMatrix';
 import EventInjector from './EventInjector';
 import AlertsPanel from './AlertsPanel';
-import AccuracyScoreboard from './AccuracyScoreboard';
 
 export default function DispatcherCockpit({
   trains = [],
@@ -22,7 +21,7 @@ export default function DispatcherCockpit({
   onInjectEvent,
   isInjecting
 }) {
-  const [activeTab, setActiveTab] = useState('OPERATIONS'); // 'OPERATIONS' | 'ETA' | 'DISRUPTIONS' | 'METRICS'
+  const [activeTab, setActiveTab] = useState('OPERATIONS'); // 'OPERATIONS' | 'ETA' | 'DISRUPTIONS'
 
   // Network health KPIs
   const kpis = useMemo(() => {
@@ -239,27 +238,6 @@ export default function DispatcherCockpit({
             </span>
           )}
         </button>
-
-        <button
-          onClick={() => setActiveTab('METRICS')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.55rem 1.1rem',
-            borderRadius: '8px',
-            border: 'none',
-            background: activeTab === 'METRICS' ? 'var(--brand-primary)' : 'transparent',
-            color: activeTab === 'METRICS' ? '#ffffff' : '#475569',
-            fontWeight: 700,
-            fontSize: '0.85rem',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease'
-          }}
-        >
-          <BarChart3 size={16} />
-          ML Accuracy Scoreboard
-        </button>
       </div>
 
       {/* Tab Panels */}
@@ -326,13 +304,6 @@ export default function DispatcherCockpit({
               isInjecting={isInjecting}
             />
             <AlertsPanel alerts={alerts} />
-          </div>
-        )}
-
-        {/* Tab 4: ML Accuracy Scoreboard */}
-        {activeTab === 'METRICS' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <AccuracyScoreboard metrics={metrics} />
           </div>
         )}
       </div>

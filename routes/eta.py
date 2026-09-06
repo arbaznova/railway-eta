@@ -20,7 +20,7 @@ def get_train_eta(train_id: str, db: Session = Depends(get_db)):
     delay estimates, uncertainty bounds (P10/P50/P90), and explanation factors.
     """
     try:
-        response = propagate_train_eta(db, train_number=train_id, persist_snapshot=True)
+        response = propagate_train_eta(db, train_number=train_id, persist_snapshot=False)
         return response
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
